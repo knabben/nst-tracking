@@ -179,8 +179,8 @@ fn main() {
     };
 
     // Validate fields - name, password
-    let mut username = "bleh132";
-    let password = "1234";
+    let mut username = "amim";
+    let password = "password";
 
     // Context and key pair
     let context = signing::create_context("secp256k1").unwrap();
@@ -244,49 +244,4 @@ fn main() {
     };
 
     println!("{:?}", response_msg);
-
-//    # Send transaction to validator
-//    submit_request = client_batch_submit_pb2.ClientBatchSubmitRequest(
-//        batches=[batch])
-
-//    await self._connection.send(
-//        validator_pb2.Message.CLIENT_BATCH_SUBMIT_REQUEST,
-//        submit_request.SerializeToString())
-//
-//    # Send status request to validator
-//    batch_id = batch.header_signature
-//    status_request = client_batch_submit_pb2.ClientBatchStatusRequest(
-//        batch_ids=[batch_id], wait=True)
-//    validator_response = await self._connection.send(
-//        validator_pb2.Message.CLIENT_BATCH_STATUS_REQUEST,
-//        status_request.SerializeToString())
-//
-//    # Parse response
-//    status_response = client_batch_submit_pb2.ClientBatchStatusResponse()
-//    status_response.ParseFromString(validator_response.content)
-//    status = status_response.batch_statuses[0].status
-//    if status == client_batch_submit_pb2.ClientBatchStatus.INVALID:
-//        error = status_response.batch_statuses[0].invalid_transactions[0]
-//    raise ApiBadRequest(error.message)
-//    elif status == client_batch_submit_pb2.ClientBatchStatus.PENDING:
-//        raise ApiInternalError('Transaction submitted but timed out')
-//    elif status == client_batch_submit_pb2.ClientBatchStatus.UNKNOWN:
-//        raise ApiInternalError('Something went wrong. Try again later')
-
-
-    // Create external on Neo4j
-
-
-//    encrypted_private_key = encrypt_private_key(
-//        request.app['aes_key'], public_key, private_key)
-//    hashed_password = hash_password(body.get('password'))
-//
-//    await self._database.create_auth_entry(
-//        public_key, encrypted_private_key, hashed_password)
-//
-//    token = generate_auth_token(
-//        request.app['secret_key'], public_key)
-//
-//    return json_response({'authorization': token})
-
 }

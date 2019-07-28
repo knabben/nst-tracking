@@ -1,0 +1,19 @@
+[package]
+name = "restapi"
+version = "0.1.0"
+authors = ["Amim Knabben <amim.knabben@gmail.com>"]
+edition = "2018"
+build = "src/build.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+sawtooth-sdk = "0.2"
+rust-crypto = "^0.2"
+protobuf = "2.2"
+uuid = { version = "0.7", features = ["v4"] }
+time = "0.1.42"
+
+[build-dependencies]
+protoc-rust-grpc = { git = "https://github.com/stepancheg/grpc-rust" }
+protoc-rust = "2.0"
