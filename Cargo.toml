@@ -5,14 +5,17 @@ authors = ["Amim Knabben <amim.knabben@gmail.com>"]
 edition = "2018"
 build = "src/build.rs"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+hyper = "0.12"
 sawtooth-sdk = "0.2"
 rust-crypto = "^0.2"
 protobuf = "2.2"
 uuid = { version = "0.7", features = ["v4"] }
 time = "0.1.42"
+futures = "0.1"
+serde = "1.0.98"
+serde_derive = "1.0"
+serde_json = "1.0.40"
 
 [build-dependencies]
 protoc-rust-grpc = { git = "https://github.com/stepancheg/grpc-rust" }
