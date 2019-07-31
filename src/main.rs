@@ -1,247 +1,66 @@
+mod endpoint;
+mod blockchain;
 mod payload;
 
+#[macro_use]
+extern crate serde_derive;
+extern crate serde_json;
+extern crate serde;
+extern crate hyper;
 extern crate time;
 extern crate sawtooth_sdk;
 extern crate crypto;
+extern crate futures;
 
-use uuid::Uuid;
-use crate::payload::{CreateAgentAction, SimpleSupplyPayload, SimpleSupplyPayload_Action};
-use std::convert::TryInto;
+use crate::futures::Stream;
 
-use std::str;
-use protobuf::Message as M;
+use futures::{future, Future};
+use hyper::{Server};
+use hyper::{Body, Method, Error, StatusCode, Request, Response};
+use hyper::service::service_fn;
 
-use protobuf::RepeatedField;
 
-use self::crypto::digest::Digest;
-
-use self::crypto::sha2::Sha512;
-use crate::sawtooth_sdk::messaging::stream::MessageConnection;
-
-use sawtooth_sdk::messages::transaction::{TransactionHeader, Transaction};
-use sawtooth_sdk::messaging::zmq_stream::{ZmqMessageConnection};
-use sawtooth_sdk::messaging::stream::MessageSender;
-use sawtooth_sdk::messages::validator::Message_MessageType;
-use sawtooth_sdk::messages::client_batch_submit::{ClientBatchSubmitRequest};
-use sawtooth_sdk::messages::batch::{BatchHeader, Batch};
-
-use sawtooth_sdk::signing;
-use sawtooth_sdk::signing::Context;
-use sawtooth_sdk::signing::PrivateKey;
-use sawtooth_sdk::signing::PublicKey;
-
-#[derive(Debug)]
-struct ConstantsTP {
-    family_name: String,
-    family_version: String,
-    agent_prefix: String,
-}
-
-fn generate_key_pair(context: &Box<dyn Context>) -> (Box<dyn PrivateKey>, Box<dyn PublicKey>){
-    let private_key = context.new_random_private_key().unwrap();
-    let public_key = context.get_public_key(&*private_key).unwrap();
-
-    println!("DEBUG: private_key: {:?}\npublic_key: {:?}", &*private_key.as_hex(), &*public_key.as_hex());
-
-    (private_key, public_key)
-}
-
-fn hashed_value(value: &str) -> String {
-    let mut hasher = Sha512::new();
-    hasher.input_str(value);
-    let hex = hasher.result_str();
-    hex
-}
-
-fn serialize_payload(username: String) -> SimpleSupplyPayload {
-    let mut create_agent = CreateAgentAction::new();
-    create_agent.set_name(username.to_string());
-
-    let timestamp = time::get_time();
-    let mills = timestamp.sec as u64 + timestamp.nsec as u64 / 1000 / 1000;
-    println!("timestamp {:?}", mills);
-
-    let action_msg = match protobuf::Message::write_to_bytes(&create_agent) {
-        Ok(b) => b,
-        Err(error) => {
-            println!("Error serializing request: {:?}", error);
-            return SimpleSupplyPayload::new();
+pub fn microservice_handler(req: Request<Body>)
+    -> Box<Future<Item=Response<Body>, Error=Error> + Send>
+{
+    match (req.method(), req.uri().path()) {
+        (&Method::POST, "/api/agent") => {
+            let body = req.into_body().concat2()
+                .map(|chunks| {
+                    println!("{:?}", chunks);
+                    let res = serde_json::from_slice::<endpoint::AgentRequest>(chunks.as_ref());
+                    match res {
+                        Ok(body) => {
+                            println!("{:?}", body);
+                            blockchain::run(body.username, body.password);
+                            Response::new(Body::empty())
+                        },
+                        Err(err) => {
+                            Response::builder()
+                                .status(StatusCode::UNPROCESSABLE_ENTITY)
+                                .body(err.to_string().into())
+                                .unwrap()
+                        },
+                    }
+                });//.and_then(|resp| serde_json::to_string(&resp));;
+            Box::new(future::ok(body))
         },
-    };
-
-    println!("DEBUG: create_agent - {:?} {:?}", action_msg, str::from_utf8(&action_msg));
-
-    let mut agent_payload = SimpleSupplyPayload::new();
-    agent_payload.set_action(SimpleSupplyPayload_Action::CREATE_AGENT);
-    agent_payload.set_create_agent(create_agent);
-    agent_payload.set_timestamp(mills.to_string());
-
-    agent_payload
-}
-
-fn serialize_tp_payload(
-    agent_payload: SimpleSupplyPayload,
-    public_key: &str,
-    constants: ConstantsTP,
-    agent_address: String,
-    signer: signing::Signer,
-) -> Batch {
-
-    let agent_msg = match protobuf::Message::write_to_bytes(&agent_payload) {
-        Ok(b) => b,
-        Err(error) => {
-            println!("Error serializing request: {:?}", error);
-            return Batch::new();
-        },
-    };
-
-    let agent_string = match str::from_utf8(&agent_msg) {
-        Ok(b) => b,
-        Err(error) => {
-            println!("Bytes error: {:?}", error);
-            return Batch::new();
+        _ => {
+            let response = Response::builder()
+                .status(StatusCode::NOT_FOUND)
+                .body(Body::empty())
+                .unwrap();
+            Box::new(future::ok(response))
         }
-    };
-    println!("DEBUG: agent - {:?}", agent_msg);
-
-    let inputs = vec![agent_address.to_string()];
-    let outputs = vec![agent_address.to_string()];
-
-    // Transaction header
-    let mut transaction_header = TransactionHeader::new();
-
-    transaction_header.set_family_name(constants.family_name);
-    transaction_header.set_family_version(constants.family_version);
-    transaction_header.set_inputs(RepeatedField::from_vec(inputs));
-    transaction_header.set_outputs(RepeatedField::from_vec(outputs));
-    transaction_header.set_signer_public_key(public_key.to_string());
-    transaction_header.set_batcher_public_key(public_key.to_string());
-    transaction_header.set_dependencies(RepeatedField::from_vec(vec![]));
-    transaction_header.set_payload_sha512(hashed_value(agent_string));
-
-    let transaction_msg = match protobuf::Message::write_to_bytes(&transaction_header) {
-        Ok(b) => b,
-        Err(error) => {
-            println!("Error serializing request: {:?}", error);
-            return Batch::new();
-        },
-    };
-
-    println!("DEBUG: transaction_header: {:?}", transaction_msg);
-
-    // Transaction
-    let mut transaction = Transaction::new();
-
-    let transaction_header_msg = match protobuf::Message::write_to_bytes(&transaction_header) {
-        Ok(b) => b,
-        Err(error) => {
-            println!("Error serializing request: {:?}", error);
-            return Batch::new();
-        },
-    };
-    let signature = signer.sign(&transaction_header_msg).unwrap();
-    transaction.set_header(transaction_header_msg);
-    transaction.set_header_signature(signature);
-    transaction.set_payload(agent_msg);
-
-    println!("DEBUG: transaction {:?}", transaction);
-
-    // Batch header
-    let mut batch_header = BatchHeader::new();
-    batch_header.set_signer_public_key(public_key.to_string());
-    batch_header.set_transaction_ids(RepeatedField::from_vec(
-        vec![transaction.get_header_signature().to_string()])
-    );
-
-    // Batch
-    let mut batch = Batch::new();
-    let batch_header_msg = match protobuf::Message::write_to_bytes(&batch_header) {
-        Ok(b) => b,
-        Err(error) => {
-            println!("Error serializing request: {:?}", error);
-            return Batch::new();
-        },
-    };
-    let sign_batch = signer.sign(&batch_header_msg).unwrap();
-
-    batch.set_header(batch_header_msg);
-    batch.set_header_signature(sign_batch);
-    batch.set_transactions(RepeatedField::from_vec(vec![transaction]));
-
-    batch
+    }
 }
 
 fn main() {
-    let _constants = ConstantsTP {
-        family_name: "simple_supply".to_string(),
-        family_version: "0.1".to_string(),
-        agent_prefix: "00".to_string()
-    };
-
-    // Validate fields - name, password
-    let mut username = "amim";
-    let password = "password";
-
-    // Context and key pair
-    let context = signing::create_context("secp256k1").unwrap();
-    let (_private_key, _public_key) = generate_key_pair(&context);
-
-    // Transaction signer
-    let crypto_factory = sawtooth_sdk::signing::CryptoFactory::new(&*context);
-    let signer = crypto_factory.new_signer(&*_private_key);
-
-    // Calculate agent address
-    let hashed_family = hashed_value(&_constants.family_name);
-    let _namespace = &hashed_family[0..6];
-    let hashed_pk = hashed_value(&*_public_key.as_hex().to_string());
-
-    // Agent address
-    let agent_address = &format!("{}{}{}", _namespace, _constants.agent_prefix, &hashed_pk[0..62]);
-    println!("{:?}", agent_address);
-
-    let agent_payload = serialize_payload(username.to_string());
-    let batch = serialize_tp_payload(
-        agent_payload,
-        &*_public_key.as_hex(),
-        _constants,
-        agent_address.to_string(),
-        signer,
+    let addr = ([127, 0, 0, 1], 8081).into();
+    let builder = Server::bind(&addr);
+    let server = builder.serve(||
+        service_fn(microservice_handler)
     );
-
-    println!("DEBUG: batch - {:?}", batch);
-// ------------------
-
-    let mut submit_request = ClientBatchSubmitRequest::new();
-    submit_request.set_batches(RepeatedField::from_vec(vec![batch]));
-
-    let connection = ZmqMessageConnection::new(&"tcp://localhost:4004");
-    let (sender, receiver) = connection.create();
-    let correlation_id = Uuid::new_v4().to_string();
-
-    let msg_bytes = match protobuf::Message::write_to_bytes(&submit_request) {
-        Ok(b) => b,
-        Err(error) => {
-            println!("Error serializing request: {:?}", error);
-            return;
-        },
-    };
-
-    let mut future = match sender.send(Message_MessageType::CLIENT_BATCH_SUBMIT_REQUEST, &correlation_id, &msg_bytes) {
-        Ok(f) => f,
-        Err(error) => {
-            println!("Error unwrapping future: {:?}", error);
-            return;
-        },
-    };
-
-    println!("{:?}", future.get().unwrap());
-    let response_msg = match future.get() {
-        Ok(m) => m,
-        Err(error) => {
-            println!("Error getting future: {:?}", error);
-            return;
-        },
-    };
-
-    println!("{:?}", response_msg);
+    let server = server.map_err(drop);
+    hyper::rt::run(server);
 }
