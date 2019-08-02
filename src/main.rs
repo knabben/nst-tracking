@@ -27,12 +27,10 @@ pub fn microservice_handler(req: Request<Body>)
         (&Method::POST, "/api/agent") => {
             let body = req.into_body().concat2()
                 .map(|chunks| {
-                    println!("{:?}", chunks);
-                    let res = serde_json::from_slice::<endpoint::AgentRequest>(chunks.as_ref());
-                    match res {
-                        Ok(body) => {
-                            println!("{:?}", body);
-                            blockchain::run(body.username, body.password);
+                    let agent = serde_json::from_slice::<endpoint::AgentRequest>(chunks.as_ref());
+                    match agent {
+                        Ok(res) => {
+                            blockchain::run(res.username, res.password);
                             Response::new(Body::empty())
                         },
                         Err(err) => {
@@ -42,8 +40,8 @@ pub fn microservice_handler(req: Request<Body>)
                                 .unwrap()
                         },
                     }
-                });//.and_then(|resp| serde_json::to_string(&resp));;
-            Box::new(future::ok(body))
+                });
+            Box::new(body)
         },
         _ => {
             let response = Response::builder()
@@ -56,7 +54,7 @@ pub fn microservice_handler(req: Request<Body>)
 }
 
 fn main() {
-    let addr = ([127, 0, 0, 1], 8081).into();
+    let addr = ([127, 0, 0, 1], 8086).into();
     let builder = Server::bind(&addr);
     let server = builder.serve(||
         service_fn(microservice_handler)
