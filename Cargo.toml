@@ -6,7 +6,6 @@ edition = "2018"
 build = "src/build.rs"
 
 [dependencies]
-hyper = "0.12"
 sawtooth-sdk = "0.2"
 rust-crypto = "^0.2"
 protobuf = "2.2"
@@ -16,6 +15,8 @@ futures = "0.1"
 serde = "1.0.98"
 serde_derive = "1.0"
 serde_json = "1.0.40"
+actix-web = "1.0"
+json = "*"
 
 [build-dependencies]
 protoc-rust-grpc = { git = "https://github.com/stepancheg/grpc-rust" }
