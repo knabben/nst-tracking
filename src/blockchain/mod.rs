@@ -17,17 +17,105 @@ use sawtooth_sdk::messaging::stream::MessageSender;
 use sawtooth_sdk::messages::validator::Message_MessageType;
 use sawtooth_sdk::messages::client_batch_submit::{ClientBatchSubmitRequest};
 use sawtooth_sdk::messages::batch::{BatchHeader, Batch};
-
 use sawtooth_sdk::signing;
-use sawtooth_sdk::signing::Context;
-use sawtooth_sdk::signing::PrivateKey;
-use sawtooth_sdk::signing::PublicKey;
 
-#[derive(Debug)]
-struct ConstantsTP {
+use sawtooth_sdk::signing::{Context, PrivateKey, PublicKey};
+
+pub struct BCTransaction {
     family_name: String,
     family_version: String,
     agent_prefix: String,
+    pub context: Box<Context>,
+}
+
+impl BCTransaction {
+    pub fn new (
+        family_name: String,
+        family_version: String,
+        agent_prefix: String
+    ) -> BCTransaction {
+        let context = signing::create_context("secp256k1").unwrap();
+        BCTransaction {
+            context: context,
+            family_name: family_name,
+            family_version: family_version,
+            agent_prefix: agent_prefix
+        }
+    }
+
+    // Context and key pair
+    pub fn generate_key_pair(&self, context: &Context) -> (Box<dyn PrivateKey>, Box<dyn PublicKey>){
+        let private_key = context.new_random_private_key().unwrap();
+        let public_key = context.get_public_key(&*private_key).unwrap();
+
+        println!("DEBUG: private_key: {:?}\npublic_key: {:?}", &*private_key.as_hex(), &*public_key.as_hex());
+
+        (private_key, public_key)
+    }
+
+    pub fn store(
+        &self,
+        signer: signing::Signer,
+        public_key: String,
+        username: String
+    ) {
+
+        // Calculate agent address
+        let hashed_family = utils::hashed_value(&self.family_name);
+        let _namespace = &hashed_family[0..6];
+        let hashed_pk = utils::hashed_value(&*public_key);
+
+        // Agent address
+        let agent_address = &format!("{}{}{}", _namespace, self.agent_prefix, &hashed_pk[0..62]);
+        println!("{:?}", agent_address);
+
+        let agent_payload = serialize_payload(username.to_string());
+        let batch = serialize_tp_payload(
+            agent_payload,
+            &*public_key,
+            self,
+            agent_address.to_string(),
+            signer,
+        );
+
+        println!("DEBUG: batch - {:?}", batch);
+        // ------------------
+
+        let mut submit_request = ClientBatchSubmitRequest::new();
+        submit_request.set_batches(RepeatedField::from_vec(vec![batch]));
+
+        let connection = ZmqMessageConnection::new(&"tcp://localhost:4004");
+        let (sender, receiver) = connection.create();
+        let correlation_id = Uuid::new_v4().to_string();
+
+        let msg_bytes = match protobuf::Message::write_to_bytes(&submit_request) {
+            Ok(b) => b,
+            Err(error) => {
+                println!("Error serializing request: {:?}", error);
+                return;
+            },
+        };
+
+        let mut future = match sender.send(Message_MessageType::CLIENT_BATCH_SUBMIT_REQUEST, &correlation_id, &msg_bytes) {
+            Ok(f) => f,
+            Err(error) => {
+                println!("Error unwrapping future: {:?}", error);
+                return;
+            },
+        };
+
+        println!("{:?}", future.get().unwrap());
+        let response_msg = match future.get() {
+            Ok(m) => m,
+            Err(error) => {
+                println!("Error getting future: {:?}", error);
+                return;
+            },
+        };
+
+        println!("{:?}", response_msg);
+    }
+
 }
 
 fn serialize_payload(username: String) -> SimpleSupplyPayload {
@@ -60,7 +148,7 @@ fn serialize_payload(username: String) -> SimpleSupplyPayload {
 fn serialize_tp_payload(
     agent_payload: SimpleSupplyPayload,
     public_key: &str,
-    constants: ConstantsTP,
+    constants: &BCTransaction,
     agent_address: String,
     signer: signing::Signer,
 ) -> Batch {
@@ -87,8 +175,8 @@ fn serialize_tp_payload(
     // Transaction header
     let mut transaction_header = TransactionHeader::new();
 
-    transaction_header.set_family_name(constants.family_name);
-    transaction_header.set_family_version(constants.family_version);
+    transaction_header.set_family_name(constants.family_name.clone());
+    transaction_header.set_family_version(constants.family_version.clone());
     transaction_header.set_inputs(RepeatedField::from_vec(inputs));
     transaction_header.set_outputs(RepeatedField::from_vec(outputs));
     transaction_header.set_signer_public_key(public_key.to_string());
@@ -146,75 +234,4 @@ fn serialize_tp_payload(
     batch.set_transactions(RepeatedField::from_vec(vec![transaction]));
 
     batch
-}
-
-pub fn run(username: String, password: String) {
-    let _constants = ConstantsTP {
-        family_name: "simple_supply".to_string(),
-        family_version: "0.1".to_string(),
-        agent_prefix: "00".to_string()
-    };
-
-    // Context and key pair
-    let context = signing::create_context("secp256k1").unwrap();
-    let (_private_key, _public_key) = utils::generate_key_pair(&context);
-
-    // Transaction signer
-    let crypto_factory = sawtooth_sdk::signing::CryptoFactory::new(&*context);
-    let signer = crypto_factory.new_signer(&*_private_key);
-
-    // Calculate agent address
-    let hashed_family = utils::hashed_value(&_constants.family_name);
-    let _namespace = &hashed_family[0..6];
-    let hashed_pk = utils::hashed_value(&*_public_key.as_hex().to_string());
-
-    // Agent address
-    let agent_address = &format!("{}{}{}", _namespace, _constants.agent_prefix, &hashed_pk[0..62]);
-    println!("{:?}", agent_address);
-
-    let agent_payload = serialize_payload(username.to_string());
-    let batch = serialize_tp_payload(
-        agent_payload,
-        &*_public_key.as_hex(),
-        _constants,
-        agent_address.to_string(),
-        signer,
-    );
-
-    println!("DEBUG: batch - {:?}", batch);
-    // ------------------
-
-    let mut submit_request = ClientBatchSubmitRequest::new();
-    submit_request.set_batches(RepeatedField::from_vec(vec![batch]));
-
-    let connection = ZmqMessageConnection::new(&"tcp://localhost:4004");
-    let (sender, receiver) = connection.create();
-    let correlation_id = Uuid::new_v4().to_string();
-
-    let msg_bytes = match protobuf::Message::write_to_bytes(&submit_request) {
-        Ok(b) => b,
-        Err(error) => {
-            println!("Error serializing request: {:?}", error);
-            return;
-        },
-    };
-
-    let mut future = match sender.send(Message_MessageType::CLIENT_BATCH_SUBMIT_REQUEST, &correlation_id, &msg_bytes) {
-        Ok(f) => f,
-        Err(error) => {
-            println!("Error unwrapping future: {:?}", error);
-            return;
-        },
-    };
-
-    println!("{:?}", future.get().unwrap());
-    let response_msg = match future.get() {
-        Ok(m) => m,
-        Err(error) => {
-            println!("Error getting future: {:?}", error);
-            return;
-        },
-    };
-
-    println!("{:?}", response_msg);
 }
