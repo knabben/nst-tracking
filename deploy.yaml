@@ -17,14 +17,6 @@ spec:
           args:
             - -c
             - "settings-tp -vv -C tcp://sawtooth-validator:4004"
-
-        - name: sawtooth-xo-tp-go
-          image: hyperledger/sawtooth-xo-tp-go:1.1
-          command:
-            - bash
-          args:
-            - -c
-            - "xo-tp-go -vv -C tcp://sawtooth-validator:4004"
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
