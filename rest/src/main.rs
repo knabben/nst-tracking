@@ -1,6 +1,5 @@
 use diesel::prelude::*;
 
-
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
@@ -17,10 +16,9 @@ mod blockchain;
 mod payload;
 
 use crate::futures::Stream;
-use json::JsonValue;
-use sawtooth_sdk::signing;
+use sawtooth_sdk::signing::{CryptoFactory};
 use futures::{future, Future};
-use actix_web::{web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{web, App, HttpResponse, HttpServer};
 
 use restapi;
 
@@ -32,13 +30,16 @@ fn create_agent(item: web::Json<endpoint::CreateAgentRequest>, data: web::Data<A
     let agent: endpoint::CreateAgentRequest = item.0;
 
     let transaction = blockchain::BCTransaction::new(
-        "simple_supply".to_string(), "0.1".to_string(), "00".to_string());
-
+        "simple_supply".to_string(), 
+        "0.1".to_string(),
+        "00".to_string()
+        );
+    
     // Generate key pairs
     let (_private_key, _public_key) = transaction.generate_key_pair(&*transaction.context);
 
     // Transaction signer
-    let crypto_factory = sawtooth_sdk::signing::CryptoFactory::new(&*transaction.context);
+    let crypto_factory = CryptoFactory::new(&*transaction.context);
     let signer = crypto_factory.new_signer(&*_private_key);
 
     transaction.store(
@@ -55,8 +56,7 @@ fn create_agent(item: web::Json<endpoint::CreateAgentRequest>, data: web::Data<A
         &connection
     );
 
-
-    HttpResponse::Ok().json(agent) // <- send json response
+    HttpResponse::Ok().json(agent)
 }
 
 fn run() {
@@ -76,6 +76,5 @@ fn run() {
 }
 
 fn main() {
-    // treat variables and clap_app
     run()
 }

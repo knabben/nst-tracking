@@ -1,2 +1,4 @@
-run:
-	cargo watch -x "run"
+shell:
+	kubectl exec -c sawtooth-shell -it sawtooth-shell bash
+
+PHONY: .shell

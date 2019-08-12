@@ -67,7 +67,6 @@ impl BCTransaction {
 
         // Agent address
         let agent_address = &format!("{}{}{}", _namespace, self.agent_prefix, &hashed_pk[0..62]);
-        println!("{:?}", agent_address);
 
         let agent_payload = serialize_payload(username.to_string());
         let batch = serialize_tp_payload(
@@ -103,8 +102,7 @@ impl BCTransaction {
                 return;
             },
         };
-
-        println!("{:?}", future.get().unwrap());
+        
         let response_msg = match future.get() {
             Ok(m) => m,
             Err(error) => {
