@@ -1,5 +1,12 @@
 use diesel::prelude::*;
 
+use crypto::sha2::Sha256;
+use jwt::{
+    Header,
+    Registered,
+    Token,
+};
+
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
@@ -24,6 +31,11 @@ use restapi;
 
 struct AppState {
     app_name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Response {
+    token: String,
 }
 
 fn create_agent(item: web::Json<endpoint::CreateAgentRequest>, data: web::Data<AppState>) -> HttpResponse {
@@ -56,7 +68,18 @@ fn create_agent(item: web::Json<endpoint::CreateAgentRequest>, data: web::Data<A
         &connection
     );
 
-    HttpResponse::Ok().json(agent)
+    let header: Header = Default::default();
+    let claims = Registered {
+        iss: Some(agent.username.clone()),
+        sub: Some(agent.username.clone()),
+        ..Default::default()
+    };
+    let token = Token::new(header, claims);
+    let value = Response{
+        token: token.signed(&*_private_key.as_slice(), Sha256::new()).unwrap()
+    };
+
+    HttpResponse::Ok().json(value)
 }
 
 fn run() {
