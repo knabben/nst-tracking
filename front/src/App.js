@@ -1,8 +1,9 @@
 import React from 'react';
-import logo from './logo.svg';
 import styled from 'styled-components'
 
 import './App.css';
+import Button from '@material-ui/core/Button';
+
 
 const Header = styled.div`
   background-color: red
@@ -12,7 +13,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-       <Header>blxxxxxxxa</Header>
+
+       <Button variant="contained" color="primary">Button</Button>
       </header>
     </div>
   );
