@@ -4,6 +4,16 @@ version = "0.1.0"
 authors = ["Amim Knabben <amim.knabben@gmail.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+sawtooth-sdk = "^0.2"
+rust-crypto = "0.2.36"
+rustc-serialize = "0.3.22"
+sawtooth-zmq = "0.8.2-dev5"
+clap = "2"
+protobuf = "2"
+log = "0.3.0"
+log4rs = "0.7.0"
+
+[build-dependencies]
+protoc-rust = "2"
+glob = "0.2"
