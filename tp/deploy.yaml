@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: tp
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: tp
+    spec:
+      containers:
+        - name: tp
+          image: tp:latest
