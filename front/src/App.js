@@ -1,13 +1,7 @@
 import React from 'react';
-import styled from 'styled-components'
 
 import './App.css';
 import Button from '@material-ui/core/Button';
-
-
-const Header = styled.div`
-  background-color: red
-`
 
 function App() {
   return (
