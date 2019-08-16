@@ -1,12 +1,9 @@
 const login = (state = [], action) => {
   switch (action.type) {
-    case 'SUCCESS_REGISTER':
-      return [
-        ...state,
-        {
-          token: action.token
-        }
-      ]
+    case "SUCCESS_REGISTER":
+      return {
+          token: action.payload.token
+      }
     default:
       return state;
   }
