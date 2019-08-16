@@ -4,7 +4,8 @@
 docker_build("tp", "./tp/",
   live_update=[
     fall_back_on("tp/Cargo.toml"),
-    sync("./tp/src", "/app/src")
+    sync("./tp/src", "/app/src"),
+    restart_container()
 ])
 k8s_yaml("tp/deploy.yaml")
 

@@ -14,14 +14,6 @@ RUN cd /protobuf && \
     ./configure --prefix=/usr --enable-static=no && \
     make -j2 && make install
 
-# RUN mkdir -p /rust-protobuf && \
-#     curl -L https://github.com/stepancheg/rust-protobuf/archive/v${RUST_PROTOBUF_VERSION}.tar.gz | tar xvz --strip 1 -C /rust-protobuf
-# RUN cd /rust-protobuf/protobuf && \
-#     RUSTFLAGS='-C linker=musl-gcc' cargo build --target=x86_64-unknown-linux-musl --release
-# RUN mkdir -p ${OUTDIR}/usr/bin && \
-#     strip /rust-protobuf/target/x86_64-unknown-linux-musl/release/protoc-gen-rust && \
-#     install -c /rust-protobuf/target/x86_64-unknown-linux-musl/release/protoc-gen-rust ${OUTDIR}/usr/bin/
-
 COPY Cargo.toml .
 COPY src/ src/
 

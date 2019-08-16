@@ -127,7 +127,7 @@ impl TransactionHandler for TradeTransactionHandler {
   }
 
   fn family_versions(&self) -> Vec<String> {
-    return self.family_versions().clone();
+    return self.family_versions.clone();
   }
 
   fn namespaces(&self) -> Vec<String> {
@@ -154,10 +154,11 @@ impl TransactionHandler for TradeTransactionHandler {
     let signer = request.get_header().get_signer_public_key();
     match payload.get_action() {
       Action::CreateAgent(agent_payload) => {
+        println!("{:?}", agent_payload);
         self._create_agent(agent_payload, signer, payload.get_timestamp())
       }
 
-      (_) => Ok(())
+      _ => Ok(())
     }
   }
 }
