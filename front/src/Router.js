@@ -1,24 +1,19 @@
 import React from "react";
 import App from "./App";
 import Signin from './components/forms/Signin'
-import Signup from './components/forms/Signup'
+import DevTools from './containers/DevTools'
+import Signup from './containers/Signup'
+import { Provider } from 'react-redux'
 
-import { BrowserRouter as Router, Route, Link} from "react-router-dom";
+import {Route, Link} from "react-router-dom";
 
-function AppRouter() {
-  return (
-    <Router>
-      <div>
-        <Link to="/">Home</Link> | 
-        <Link to="/signin">Signin</Link> | 
-        <Link to="/signup">Signup</Link>
-      </div>
+const Root = ({ store }) => (
+  <Provider store={store}>
+    <Route path="/" exact component={App} />
+    <Route path="/signup" exact component={Signup} />
+    <Route path="/signin" exact component={Signin} />
+    <DevTools />
+  </Provider>
+)
 
-      <Route path="/" exact component={App} />
-      <Route path="/signup" exact component={Signup} />
-      <Route path="/signin" exact component={Signin} />
-    </Router>
-  )
-}
-
-export default AppRouter;
+export default Root;
