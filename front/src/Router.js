@@ -1,8 +1,9 @@
 import React from "react";
 import App from "./App";
-import Signin from './components/forms/Signin'
+
 import DevTools from './containers/DevTools'
 import Signup from './containers/Signup'
+import Signin from './containers/Signin'
 import { Provider } from 'react-redux'
 
 import {Route, Link} from "react-router-dom";

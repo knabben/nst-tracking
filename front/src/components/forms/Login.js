@@ -1,29 +1,29 @@
 import React from 'react';
 import { Formik } from 'formik';
 import { Container } from '@material-ui/core';
-import { useStyles } from './styles';
+import { useStyles } from '../styles';
 import Input from '@material-ui/core/Input';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-export default function SignupForm({
+export default function LoginForm({
   handleSubmit, 
   handleChange,
   handleBlur, 
   values, 
   errors,
   touched,
-  isSubmitting
+  isSubmitting,
+  props
 }) {
   const classes = useStyles();
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Typography component="h1" variant="h5">
-          Sign up
-        </Typography>
+        <Typography component="h1" variant="h5">  </Typography>
         <form onSubmit={handleSubmit} noValidate autoComplete="off">
           <Input
             fullWidth
@@ -54,7 +54,7 @@ export default function SignupForm({
             disabled={isSubmitting}
             type="submit"
           >
-            Signup
+            Submit
           </Button>
         </form>
       </div>

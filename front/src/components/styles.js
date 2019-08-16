@@ -5,6 +5,12 @@ export const useStyles = makeStyles(theme => ({
   button: {
     margin: theme.spacing(1),
   },
+  menu: {
+    marginTop: theme.spacing(1),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
   paper: {
     marginTop: theme.spacing(8),
     display: 'flex',

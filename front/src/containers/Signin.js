@@ -1,7 +1,7 @@
 import React from 'react';
 import LoginForm from '../components/forms/Login'
 import { withFormik } from 'formik';
-import { registerUser } from '../actions'
+import { loginUser } from '../actions'
 import { connect } from 'react-redux'
 
 const initialValues = {
@@ -9,20 +9,21 @@ const initialValues = {
   password: ''
 };
 
-const mapStateToProps = (state) => ({title: "Signup"})
+const mapStateToProps = undefined;
 const mapDispatchToProps = dispatch => ({
-  registerUser(user, password) { 
-    dispatch(registerUser(user, password)) 
+  loginUser(user, password) { 
+    dispatch(loginUser(user, password)) 
   },
 });
 
-const Signup = connect(
+const Signin = connect(
   mapStateToProps, 
   mapDispatchToProps
 )(withFormik({
+  title: "Signin",
   mapPropsToValues: () => initialValues,
   handleSubmit: (values, actions) => {
-    actions.props.registerUser(
+    actions.props.loginUser(
       values.username, 
       values.password
     )
@@ -30,4 +31,4 @@ const Signup = connect(
   }
 })(LoginForm))
 
-export default Signup;
+export default Signin;
