@@ -16,7 +16,7 @@ spec:
             - bash
           args:
             - -c
-            - "settings-tp -vv -C tcp://sawtooth-validator:4004"
+            - "settings-tp -vvv -C tcp://sawtooth-validator:4004"
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -47,7 +47,7 @@ spec:
             && sawtooth keygen my_key \
             && sawset genesis -k /root/.sawtooth/keys/my_key.priv \
             && sawadm genesis config-genesis.batch \
-            && sawtooth-validator -vv \
+            && sawtooth-validator -vvv \
                 --endpoint tcp://0.0.0.0:8800 \
                 --bind component:tcp://0.0.0.0:4004 \
                 --bind consensus:tcp://0.0.0.0:5050 \
@@ -59,7 +59,7 @@ spec:
             - bash
           args:
             - -c
-            - "devmode-engine-rust -C tcp://localhost:5050"
+            - "devmode-engine-rust -C tcp://sawtooth-validator:5050"
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
