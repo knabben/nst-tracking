@@ -85,6 +85,7 @@ impl BCTransaction {
 
         let connection = ZmqMessageConnection::new(&"tcp://localhost:4004");
         let (sender, receiver) = connection.create();
+        
         let correlation_id = Uuid::new_v4().to_string();
 
         let msg_bytes = match protobuf::Message::write_to_bytes(&submit_request) {
@@ -102,7 +103,7 @@ impl BCTransaction {
                 return;
             },
         };
-        
+        println!("Client batch submit");
         let response_msg = match future.get() {
             Ok(m) => m,
             Err(error) => {
