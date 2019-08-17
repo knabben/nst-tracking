@@ -1,4 +1,4 @@
-mod utils;
+pub mod utils;
 pub mod transaction;
 
 use std::str;
@@ -16,17 +16,16 @@ fn serialize_payload(username: String) -> SimpleSupplyPayload {
 
     let timestamp = time::get_time();
     let mills = timestamp.sec as u64 + timestamp.nsec as u64 / 1000 / 1000;
-    println!("timestamp {:?}", mills);
+    debug!("timestamp {:?}", mills);
 
     let action_msg = match protobuf::Message::write_to_bytes(&create_agent) {
         Ok(b) => b,
         Err(error) => {
-            println!("Error serializing request: {:?}", error);
+            error!("Error serializing request: {:?}", error);
             return SimpleSupplyPayload::new();
         },
     };
-
-    println!("DEBUG: create_agent - {:?} {:?}", action_msg, str::from_utf8(&action_msg));
+    debug!("create_agent - {:?} {:?}", action_msg, str::from_utf8(&action_msg));
 
     let mut agent_payload = SimpleSupplyPayload::new();
     agent_payload.set_action(SimpleSupplyPayload_Action::CREATE_AGENT);
@@ -46,7 +45,7 @@ fn serialize_tp_payload(
     let agent_msg = match protobuf::Message::write_to_bytes(&agent_payload) {
         Ok(b) => b,
         Err(error) => {
-            println!("Error serializing request: {:?}", error);
+            error!("Error serializing request: {:?}", error);
             return Batch::new();
         },
     };
@@ -54,11 +53,11 @@ fn serialize_tp_payload(
     let agent_string = match str::from_utf8(&agent_msg) {
         Ok(b) => b,
         Err(error) => {
-            println!("Bytes error: {:?}", error);
+            error!("Bytes error: {:?}", error);
             return Batch::new();
         }
     };
-    println!("DEBUG: agent - {:?}", agent_msg);
+    debug!("agent - {:?}", agent_msg);
 
     let inputs = vec![agent_address.to_string()];
     let outputs = vec![agent_address.to_string()];
@@ -78,12 +77,11 @@ fn serialize_tp_payload(
     let transaction_msg = match protobuf::Message::write_to_bytes(&transaction_header) {
         Ok(b) => b,
         Err(error) => {
-            println!("Error serializing request: {:?}", error);
+            error!("Error serializing request: {:?}", error);
             return Batch::new();
         },
     };
-
-    println!("DEBUG: transaction_header: {:?}", transaction_msg);
+    debug!("transaction_header: {:?}", transaction_msg);
 
     // Transaction
     let mut transaction = Transaction::new();
@@ -91,7 +89,7 @@ fn serialize_tp_payload(
     let transaction_header_msg = match protobuf::Message::write_to_bytes(&transaction_header) {
         Ok(b) => b,
         Err(error) => {
-            println!("Error serializing request: {:?}", error);
+            error!("Error serializing request: {:?}", error);
             return Batch::new();
         },
     };
@@ -99,8 +97,7 @@ fn serialize_tp_payload(
     transaction.set_header(transaction_header_msg);
     transaction.set_header_signature(signature);
     transaction.set_payload(agent_msg);
-
-    println!("DEBUG: transaction {:?}", transaction);
+    debug!("transaction {:?}", transaction);
 
     // Batch header
     let mut batch_header = BatchHeader::new();
@@ -109,12 +106,12 @@ fn serialize_tp_payload(
         vec![transaction.get_header_signature().to_string()])
     );
 
-    // Batch
+    // Batch protobuf
     let mut batch = Batch::new();
     let batch_header_msg = match protobuf::Message::write_to_bytes(&batch_header) {
         Ok(b) => b,
         Err(error) => {
-            println!("Error serializing request: {:?}", error);
+            error!("Error serializing request: {:?}", error);
             return Batch::new();
         },
     };

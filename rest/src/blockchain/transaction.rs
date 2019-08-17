@@ -1,3 +1,5 @@
+use log::Level;
+
 use crate::blockchain::utils;
 use crate::validator::SawtoothConnection;
 
@@ -15,7 +17,7 @@ pub struct BCTransaction {
     pub family_name: String,
     pub family_version: String,
     pub agent_prefix: String,
-    pub context: Box<Context>,
+    pub context: Box<dyn Context>,
 }
 
 impl BCTransaction {
@@ -30,7 +32,7 @@ impl BCTransaction {
     }
 
     // Context and key pair
-    pub fn generate_key_pair(&self, context: &Context) -> (Box<dyn PrivateKey>, Box<dyn PublicKey>){
+    pub fn generate_key_pair(&self, context: &dyn Context) -> (Box<dyn PrivateKey>, Box<dyn PublicKey>){
         let private_key = context.new_random_private_key().unwrap();
         let public_key = context.get_public_key(&*private_key).unwrap();
         debug!("private_key: {:?}\npublic_key: {:?}", &*private_key.as_hex(), &*public_key.as_hex());
@@ -40,7 +42,6 @@ impl BCTransaction {
     pub fn store(
         &self, signer: signing::Signer, public_key: String, username: String, sender: SawtoothConnection,
     ) {
-
         // Calculate agent address
         let hashed_family = utils::hashed_value(&self.family_name);
         let _namespace = &hashed_family[0..6];
@@ -88,7 +89,6 @@ impl BCTransaction {
             },
         };
         
-        println!("Client batch submit");
-        println!("{:?}", response_msg);
+        println!("Client batch submit: {:?}", response_msg);
     }
 }

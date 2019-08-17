@@ -3,6 +3,8 @@
 #[macro_use] extern crate diesel;
 #[macro_use] extern crate log;
 #[macro_use] extern crate serde_derive;
+#[macro_use] extern crate hex_literal;
+
 extern crate serde_json;
 extern crate serde;
 extern crate time;
@@ -35,7 +37,7 @@ pub struct AppState {
     database_connection: database::ConnectionPool,
 }
 
-fn run() -> Result<(), Box<Error>> {
+fn run() -> Result<(), Box<dyn Error>> {
     let matches = ClapApp::new("app")
         .arg(Arg::with_name("connect")
             .help("Endpoint validator")
