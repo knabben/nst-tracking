@@ -42,13 +42,49 @@ use crate::database::run_all_migrations;
 use crate::futures::Stream;
 use sawtooth_sdk::signing::{CryptoFactory};
 use futures::{future, Future};
+
+use actix::{Addr, SyncArbiter};
 use actix_web::{http, web, App, HttpResponse, HttpServer};
 use actix_cors::Cors;
 
+use crate::database::ConnectionPool;
+
+use actix::{Actor, Context, SyncContext};
+use sawtooth_sdk::messaging::stream::MessageSender;
+
 use restapi;
 
-struct AppState {
-    app_name: String,
+pub struct AppState {
+    //sawtooth_connection: Box<dyn MessageSender + Send>,
+    database_connection: database::ConnectionPool,
+}
+
+pub struct DbExecutor {
+    connection_pool: ConnectionPool,
+}
+
+impl Actor for DbExecutor {
+    type Context = SyncContext<Self>;
+}
+
+impl DbExecutor {
+    pub fn new(connection_pool: ConnectionPool) -> DbExecutor {
+        DbExecutor { connection_pool }
+    }
+}
+
+pub struct SawtoothMessageSender {
+    sender: Box<dyn MessageSender>,
+}
+
+impl Actor for SawtoothMessageSender {
+    type Context = Context<Self>;
+}
+
+impl SawtoothMessageSender {
+    pub fn new(sender: Box<dyn MessageSender>) -> SawtoothMessageSender {
+        SawtoothMessageSender { sender }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -56,7 +92,10 @@ struct Response {
     token: String,
 }
 
-fn create_agent(item: web::Json<endpoint::CreateAgentRequest>, data: web::Data<AppState>) -> HttpResponse {
+fn create_agent(
+    item: web::Json<endpoint::CreateAgentRequest>, 
+    data: web::Data<AppState>
+) -> HttpResponse {
     let agent: endpoint::CreateAgentRequest = item.0;
 
     let transaction = blockchain::BCTransaction::new(
@@ -78,27 +117,25 @@ fn create_agent(item: web::Json<endpoint::CreateAgentRequest>, data: web::Data<A
         agent.username.clone()
     );
 
-    // let connection = restapi::establish_connection();
-    // restapi::create_auth(
-    //     &*_public_key,
-    //     &*_private_key,
-    //     agent.password.to_string(),
-    //     &connection
-    // );
+    let connection = &data.database_connection;
+    database::create_auth(
+        &*_public_key,
+        &*_private_key,
+        agent.password.to_string(),
+        &connection.get().unwrap()
+    );
 
-    // let header: Header = Default::default();
-    // let claims = Registered {
-    //     iss: Some(agent.username.clone()),
-    //     sub: Some(agent.username.clone()),
-    //     ..Default::default()
-    // };
-    // let token = Token::new(header, claims);
-    // let value = Response{
-    //     token: token.signed(&*_private_key.as_slice(), Sha256::new()).unwrap()
-    // };
-    let value = Response{
-        token: "".to_string()
+    let header: Header = Default::default();
+    let claims = Registered {
+        iss: Some(agent.username.clone()),
+        sub: Some(agent.username.clone()),
+        ..Default::default()
     };
+    let token = Token::new(header, claims);
+    let value = Response{
+        token: token.signed(&*_private_key.as_slice(), Sha256::new()).unwrap()
+    };
+
     HttpResponse::Ok().json(value)
 }
 
@@ -152,10 +189,11 @@ fn run() -> Result<(), Box<Error>> {
     let sawtooth_connection = SawtoothConnection::new(config.validator_endpoint());
     let connection_pool = database::create_connection_pool(&database_url)?;
 
-    HttpServer::new(|| {
+    HttpServer::new(move || {
         App::new()
             .data(AppState {
-                app_name: String::from("haaaa"),
+                //sawtooth_connection: sawtooth_connection.get_sender(),
+                database_connection: connection_pool.clone(),
             })
             .wrap(
                 Cors::new()
