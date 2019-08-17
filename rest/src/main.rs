@@ -1,20 +1,8 @@
-#[macro_use]
-extern crate clap;
-
+#[macro_use] extern crate clap;
+#[macro_use] extern crate diesel_migrations;
 #[macro_use] extern crate diesel;
-
-#[macro_use]
-extern crate diesel_migrations;
-
-use crypto::sha2::Sha256;
-use jwt::{
-    Header,
-    Registered,
-    Token,
-};
-
-#[macro_use]
-extern crate serde_derive;
+#[macro_use] extern crate log;
+#[macro_use] extern crate serde_derive;
 extern crate serde_json;
 extern crate serde;
 extern crate time;
@@ -25,10 +13,10 @@ extern crate futures;
 extern crate json;
 mod validator;
 mod config;
-mod endpoint;
 mod blockchain;
 mod payload;
 mod database;
+mod routes;
 
 use std::error::Error;
 
@@ -39,104 +27,13 @@ use clap::{App as ClapApp, Arg};
 use crate::validator::SawtoothConnection;
 use crate::database::run_all_migrations;
 
-use crate::futures::Stream;
-use sawtooth_sdk::signing::{CryptoFactory};
-use futures::{future, Future};
-
-use actix::{Addr, SyncArbiter};
-use actix_web::{http, web, App, HttpResponse, HttpServer};
 use actix_cors::Cors;
-
-use crate::database::ConnectionPool;
-
-use actix::{Actor, Context, SyncContext};
-use sawtooth_sdk::messaging::stream::MessageSender;
-
-use restapi;
+use actix_web::{http, web, App, HttpServer};
+use routes::agents::{create_agent};
 
 pub struct AppState {
-    //sawtooth_connection: Box<dyn MessageSender + Send>,
+    sawtooth_connection: SawtoothConnection,
     database_connection: database::ConnectionPool,
-}
-
-pub struct DbExecutor {
-    connection_pool: ConnectionPool,
-}
-
-impl Actor for DbExecutor {
-    type Context = SyncContext<Self>;
-}
-
-impl DbExecutor {
-    pub fn new(connection_pool: ConnectionPool) -> DbExecutor {
-        DbExecutor { connection_pool }
-    }
-}
-
-pub struct SawtoothMessageSender {
-    sender: Box<dyn MessageSender>,
-}
-
-impl Actor for SawtoothMessageSender {
-    type Context = Context<Self>;
-}
-
-impl SawtoothMessageSender {
-    pub fn new(sender: Box<dyn MessageSender>) -> SawtoothMessageSender {
-        SawtoothMessageSender { sender }
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Response {
-    token: String,
-}
-
-fn create_agent(
-    item: web::Json<endpoint::CreateAgentRequest>, 
-    data: web::Data<AppState>
-) -> HttpResponse {
-    let agent: endpoint::CreateAgentRequest = item.0;
-
-    let transaction = blockchain::BCTransaction::new(
-        "trade".to_string(), 
-        "1.0".to_string(),
-        "00".to_string()
-        );
-    
-    // Generate key pairs
-    let (_private_key, _public_key) = transaction.generate_key_pair(&*transaction.context);
-
-    // Transaction signer
-    let crypto_factory = CryptoFactory::new(&*transaction.context);
-    let signer = crypto_factory.new_signer(&*_private_key);
-
-    transaction.store(
-        signer,
-        _public_key.as_hex().to_string(),
-        agent.username.clone()
-    );
-
-    let connection = &data.database_connection;
-    database::create_auth(
-        &*_public_key,
-        &*_private_key,
-        agent.password.to_string(),
-        &connection.get().unwrap()
-    );
-
-    let header: Header = Default::default();
-    let claims = Registered {
-        iss: Some(agent.username.clone()),
-        sub: Some(agent.username.clone()),
-        ..Default::default()
-    };
-    let token = Token::new(header, claims);
-    let value = Response{
-        token: token.signed(&*_private_key.as_slice(), Sha256::new()).unwrap()
-    };
-
-    HttpResponse::Ok().json(value)
 }
 
 fn run() -> Result<(), Box<Error>> {
@@ -183,16 +80,19 @@ fn run() -> Result<(), Box<Error>> {
     let database_url = config.database_endpoint();
 
     // Run diesel migrations
-    run_all_migrations(&database_url);
+    match run_all_migrations(&database_url) {
+        Ok(m) => m,
+        Err(e) => error!("Error {:?}", e),
+    }
 
     // Sawtooth connection
-    let sawtooth_connection = SawtoothConnection::new(config.validator_endpoint());
     let connection_pool = database::create_connection_pool(&database_url)?;
+    let sawtooth_connection = SawtoothConnection::new(config.validator_endpoint());
 
     HttpServer::new(move || {
         App::new()
             .data(AppState {
-                //sawtooth_connection: sawtooth_connection.get_sender(),
+                sawtooth_connection: sawtooth_connection.clone(),
                 database_connection: connection_pool.clone(),
             })
             .wrap(

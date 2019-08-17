@@ -11,6 +11,8 @@ use protobuf::RepeatedField;
 
 use crate::sawtooth_sdk::messaging::stream::MessageConnection;
 
+use actix::{Addr};
+
 use sawtooth_sdk::messages::transaction::{TransactionHeader, Transaction};
 use sawtooth_sdk::messaging::zmq_stream::{ZmqMessageConnection};
 use sawtooth_sdk::messaging::stream::MessageSender;
@@ -19,6 +21,7 @@ use sawtooth_sdk::messages::client_batch_submit::{ClientBatchSubmitRequest};
 use sawtooth_sdk::messages::batch::{BatchHeader, Batch};
 use sawtooth_sdk::signing;
 
+use crate::validator::SawtoothConnection;
 use sawtooth_sdk::signing::{Context, PrivateKey, PublicKey};
 
 pub struct BCTransaction {
@@ -57,7 +60,8 @@ impl BCTransaction {
         &self,
         signer: signing::Signer,
         public_key: String,
-        username: String
+        username: String,
+        sender: SawtoothConnection,
     ) {
 
         // Calculate agent address
@@ -77,17 +81,11 @@ impl BCTransaction {
             signer,
         );
 
-        println!("DEBUG: batch - {:?}", batch);
-        // ------------------
-
         let mut submit_request = ClientBatchSubmitRequest::new();
         submit_request.set_batches(RepeatedField::from_vec(vec![batch]));
 
-        let connection = ZmqMessageConnection::new(&"tcp://localhost:4004");
-        let (sender, receiver) = connection.create();
-        
+        // Protobuf writing
         let correlation_id = Uuid::new_v4().to_string();
-
         let msg_bytes = match protobuf::Message::write_to_bytes(&submit_request) {
             Ok(b) => b,
             Err(error) => {
@@ -96,14 +94,15 @@ impl BCTransaction {
             },
         };
 
-        let mut future = match sender.send(Message_MessageType::CLIENT_BATCH_SUBMIT_REQUEST, &correlation_id, &msg_bytes) {
+        // Send to ZeroMQ
+        let mut future = match sender.get_sender().send(Message_MessageType::CLIENT_BATCH_SUBMIT_REQUEST, &correlation_id, &msg_bytes) {
             Ok(f) => f,
             Err(error) => {
                 println!("Error unwrapping future: {:?}", error);
                 return;
             },
         };
-        println!("Client batch submit");
+        
         let response_msg = match future.get() {
             Ok(m) => m,
             Err(error) => {
@@ -111,7 +110,8 @@ impl BCTransaction {
                 return;
             },
         };
-
+        
+        println!("Client batch submit");
         println!("{:?}", response_msg);
     }
 

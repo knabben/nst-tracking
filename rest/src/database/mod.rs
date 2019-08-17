@@ -21,7 +21,9 @@ type Aes128Cbc = Cbc<Aes128, Pkcs7>;
 use crate::database::models::{Auth};
 use sawtooth_sdk::signing::{PrivateKey, PublicKey};
 
-use diesel_migrations::run_pending_migrations;
+use diesel_migrations::{
+  run_pending_migrations,
+};
 use diesel::{
     connection::Connection as _,
     pg::PgConnection,
