@@ -9,8 +9,8 @@ extern crate time;
 extern crate sawtooth_sdk;
 extern crate crypto;
 extern crate futures;
-
 extern crate json;
+
 mod validator;
 mod config;
 mod blockchain;
@@ -19,7 +19,6 @@ mod database;
 mod routes;
 
 use std::error::Error;
-
 use log::Level;
 use simple_logger;
 use clap::{App as ClapApp, Arg};

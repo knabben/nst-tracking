@@ -1,7 +1,7 @@
 use crate::routes::{CreateAgentRequest, Response};
 use crate::{AppState};
 use crate::database::{create_auth};
-use crate::blockchain::{BCTransaction};
+use crate::blockchain::transaction::{BCTransaction};
 
 use sawtooth_sdk::signing::{CryptoFactory};
 use actix_web::{http, web, HttpResponse};
@@ -12,7 +12,6 @@ use jwt::{
     Registered,
     Token,
 };
-
 
 pub fn create_agent(
     item: web::Json<CreateAgentRequest>, data: web::Data<AppState>
@@ -39,7 +38,6 @@ pub fn create_agent(
         agent.username.clone(),
         data.sawtooth_connection.clone()
     );
-
 
     // Save on database
     let connection = &data.database_connection;
