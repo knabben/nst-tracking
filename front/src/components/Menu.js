@@ -6,7 +6,7 @@ import Tab from '@material-ui/core/Tab';
 import { useStyles } from './styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-export default function Menu() {
+const Menu = ({authenticated}) => {
   const classes = useStyles();
   const [value, setValue] = React.useState(0)
 
@@ -17,13 +17,20 @@ export default function Menu() {
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
+      
       <div className={classes.menu}>
-        <Tabs value={value} onChange={handleChange}>
+        <Tabs value={0} onChange={handleChange}>
           <Tab value={0} label="Home" to="/" component={Link}/>
-          <Tab value={1} label="Signin" to="/signin" component={Link}/>
-          <Tab value={2} label="Signup" to="/signup" component={Link}/>
+          {
+            !authenticated && 
+            <div>
+              <Tab value={1} label="Signin" to="/signin" component={Link}/>
+              <Tab value={2} label="Signup" to="/signup" component={Link}/>
+            </div>
+          }
         </Tabs>
       </div>
     </Container>
   ) 
 }
+export default Menu

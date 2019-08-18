@@ -6,12 +6,10 @@ import Root from './Router';
 import * as serviceWorker from './serviceWorker';
 import { BrowserRouter } from 'react-router-dom';
 import configureStore from './store'
-import Menu from './components/Menu'
 
 const store = configureStore()
 ReactDOM.render(
   <BrowserRouter>
-    <Menu />
     <Root store={store} />
   </BrowserRouter>,
   document.getElementById('root')

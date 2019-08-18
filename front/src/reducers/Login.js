@@ -3,7 +3,7 @@ import {
   SUCCESS_LOGIN 
 } from "../actions";
 
-const login = (state = [], action) => {
+const login = (state = {}, action) => {
   switch (action.type) {
     case SUCCESS_REGISTER:
       return {

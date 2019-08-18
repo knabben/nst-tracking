@@ -5,15 +5,21 @@ import DevTools from './containers/DevTools'
 import Signup from './containers/Signup'
 import Signin from './containers/Signin'
 import { Provider } from 'react-redux'
+import { ConnectedRouter } from 'connected-react-router'
 
-import {Route, Link} from "react-router-dom";
+import Menu from './containers/Menu';
+import {Route} from "react-router-dom";
+import { history } from './store'
 
 const Root = ({ store }) => (
   <Provider store={store}>
-    <Route path="/" exact component={App} />
-    <Route path="/signup" exact component={Signup} />
-    <Route path="/signin" exact component={Signin} />
-    <DevTools />
+    <ConnectedRouter history={history}>
+      <Menu />
+      <Route path="/" exact component={App} />
+      <Route path="/signup" exact component={Signup} />
+      <Route path="/signin" exact component={Signin} />
+      <DevTools />
+    </ConnectedRouter>
   </Provider>
 )
 
