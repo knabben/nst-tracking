@@ -2,6 +2,7 @@ import {
   serviceCreateUser,
   serviceLoginUser 
 } from '../services'
+import { push } from 'connected-react-router'
 
 export const SUCCESS_REGISTER = 'SUCCESS_REGISTER';
 export const SUCCESS_LOGIN = 'SUCCESS_LOGIN';
@@ -10,7 +11,10 @@ export function registerUser(username, password) {
   return function(dispatch) {
     return serviceCreateUser(username, password).then(
       response => {
-        response.json().then(data => dispatch(successRegister(data.token)))
+        response.json().then(data => {
+          dispatch(successRegister(data.token))
+          dispatch(push("/"))
+        })
       },
       error => console.error(error), 
     )
@@ -21,9 +25,14 @@ export function loginUser(username, password) {
   return function(dispatch) {
     return serviceLoginUser(username, password).then(
       response => {
-        response.json().then(data => dispatch(successLogin(data.token)))
+        response.json().then(data => {
+          dispatch(successLogin(data.token))
+          dispatch(push("/"))
+        })
       },
-      error => console.error(error), 
+      error => {
+        console.error(error)
+      }
     )
   }
 }

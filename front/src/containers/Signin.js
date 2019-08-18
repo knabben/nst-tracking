@@ -3,7 +3,6 @@ import LoginForm from '../components/forms/Login'
 import { withFormik } from 'formik';
 import { loginUser } from '../actions'
 import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
 
 const initialValues = {
   username: '',
@@ -15,7 +14,6 @@ const mapDispatchToProps = dispatch => ({
   loginUser(user, password) { 
     dispatch(loginUser(user, password)) 
   },
-  redirectHome() { dispatch(push("/")) }
 });
 
 const Signin = connect(
@@ -29,7 +27,6 @@ const Signin = connect(
       values.password
     )
     actions.setSubmitting(false)
-    actions.props.redirectHome()
   }
 })(LoginForm))
 

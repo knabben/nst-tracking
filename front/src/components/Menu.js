@@ -20,10 +20,11 @@ const Menu = ({authenticated}) => {
       
       <div className={classes.menu}>
         <Tabs value={0} onChange={handleChange}>
-          <Tab value={0} label="Home" to="/" component={Link}/>
+          { authenticated && 
+            <Tab value={0} label="Home" to="/" component={Link}/>
+          }
           {
-            !authenticated && 
-            <div>
+            !authenticated && <div>
               <Tab value={1} label="Signin" to="/signin" component={Link}/>
               <Tab value={2} label="Signup" to="/signup" component={Link}/>
             </div>
