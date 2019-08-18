@@ -1,4 +1,5 @@
 pub mod agents;
+pub mod utils;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateAgentRequest {
@@ -7,6 +8,12 @@ pub struct CreateAgentRequest {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Response {
+pub struct AuthorizeAgentRequest {
+    pub username: String,
+    pub password: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Response {
     token: String,
 }

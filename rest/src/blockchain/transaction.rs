@@ -40,7 +40,7 @@ impl BCTransaction {
     }
 
     pub fn store(
-        &self, signer: signing::Signer, public_key: String, username: String, sender: SawtoothConnection,
+        &self, signer: signing::Signer, public_key: String, username: &str, sender: SawtoothConnection,
     ) {
         // Calculate agent address
         let hashed_family = utils::hashed_value(&self.family_name);

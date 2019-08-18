@@ -1,5 +1,3 @@
-
-
 pub mod models;
 pub mod schema;
 
@@ -19,7 +17,6 @@ use block_modes::{BlockMode, Cbc};
 use block_modes::block_padding::Pkcs7;
 
 use crate::diesel::RunQueryDsl;
-
 type Aes128Cbc = Cbc<Aes128, Pkcs7>;
 
 use crate::database::models::{Auth};
@@ -72,6 +69,7 @@ pub fn create_connection_pool(database_url: &str) -> Result<ConnectionPool, r2d2
 pub fn create_auth(
     public_key: &dyn PublicKey,
     private_key: &dyn PrivateKey,
+    username: String,
     password: String,
     conn: &PgConnection
 ) -> Auth {
@@ -90,11 +88,27 @@ pub fn create_auth(
     let mut hasher = Sha512::new();
     hasher.input_str(&password);
 
-    let authx = NewAuth {
+    let auth_data = NewAuth {
         public_key: &public_key.as_hex(),
+        username: &username,
         hashed_password: &hasher.result_str(),
         encrypted_private_key: &hex::encode(ciphertext),
     };
 
-    diesel::insert_into(auth::table).values(&authx).get_result(conn).expect("Error saving new post")
+    diesel::insert_into(auth::table)
+      .values(&auth_data)
+      .get_result(conn)
+      .expect("Error saving new post")
+}
+
+pub fn fetch_auth_resource(un: String, conn: &PgConnection) -> self::models::Auth {
+  use self::schema::auth::dsl::*;
+  use diesel::prelude::*;
+
+  let results = auth
+    .filter(username.eq(un))
+    .first::<Auth>(conn)
+    .expect("Error loading users.");
+
+  results
 }

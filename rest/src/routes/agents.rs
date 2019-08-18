@@ -1,17 +1,14 @@
-use crate::routes::{CreateAgentRequest, Response};
+use crate::routes::{CreateAgentRequest, AuthorizeAgentRequest};
 use crate::{AppState};
-use crate::database::{create_auth};
+use crate::database::{create_auth, fetch_auth_resource};
 use crate::blockchain::transaction::{BCTransaction};
 
+use crate::routes::utils::{generate_jwt};
 use sawtooth_sdk::signing::{CryptoFactory};
 use actix_web::{http, web, HttpResponse};
 
-use crypto::sha2::Sha256;
-use jwt::{
-    Header,
-    Registered,
-    Token,
-};
+use crypto::digest::Digest;
+use crypto::sha2::{Sha256, Sha512};
 
 pub fn create_agent(
     item: web::Json<CreateAgentRequest>, data: web::Data<AppState>
@@ -30,12 +27,13 @@ pub fn create_agent(
     // Transaction signer
     let crypto_factory = CryptoFactory::new(&*transaction.context);
     let signer = crypto_factory.new_signer(&*_private_key);
-
+    let username = agent.username.clone();
+    
     // Save transaction on sawtooth
     transaction.store(
         signer,
         _public_key.as_hex().to_string(),
-        agent.username.clone(),
+        &username,
         data.sawtooth_connection.clone()
     );
 
@@ -44,21 +42,26 @@ pub fn create_agent(
     create_auth(
         &*_public_key,
         &*_private_key,
+        username.clone(),
         agent.password.to_string(),
         &connection.get().unwrap()
     );
 
-    // Generate token
-    let header: Header = Default::default();
-    let claims = Registered {
-        iss: Some(agent.username.clone()),
-        sub: Some(agent.username.clone()),
-        ..Default::default()
-    };
-    let token = Token::new(header, claims);
-    let value = Response{
-        token: token.signed(&*_private_key.as_slice(), Sha256::new()).unwrap()
-    };
- 
-    HttpResponse::Ok().json(value)
+    HttpResponse::Ok().json(generate_jwt(username.clone(), &data.jwt_sign.as_bytes()))
+}
+
+pub fn authentication(
+    item: web::Json<AuthorizeAgentRequest>, data: web::Data<AppState>
+) -> HttpResponse {
+    let mut hasher = Sha512::new();
+    let agent: AuthorizeAgentRequest = item.0;
+    let auth_info = fetch_auth_resource(agent.username.clone(), &data.database_connection.get().unwrap());
+
+    hasher.input_str(&agent.password);
+    if hasher.result_str() != auth_info.hashed_password {
+        HttpResponse::NotFound().json("Not found")
+    } else {
+        let token = generate_jwt(agent.username.clone(),  &data.jwt_sign.as_bytes());
+        HttpResponse::Ok().json(token)
+    }
 }

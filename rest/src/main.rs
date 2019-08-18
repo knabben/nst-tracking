@@ -30,11 +30,12 @@ use crate::database::run_all_migrations;
 
 use actix_cors::Cors;
 use actix_web::{http, web, App, HttpServer};
-use routes::agents::{create_agent};
+use routes::agents::{create_agent, authentication};
 
 pub struct AppState {
     sawtooth_connection: SawtoothConnection,
     database_connection: database::ConnectionPool,
+    jwt_sign: String,
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
@@ -95,6 +96,7 @@ fn run() -> Result<(), Box<dyn Error>> {
             .data(AppState {
                 sawtooth_connection: sawtooth_connection.clone(),
                 database_connection: connection_pool.clone(),
+                jwt_sign: "1234567890".to_string(),
             })
             .wrap(
                 Cors::new()
@@ -106,6 +108,7 @@ fn run() -> Result<(), Box<dyn Error>> {
             .service(
                 web::scope("/api")
                     .route("/agent", web::post().to(create_agent))
+                    .route("/authentication", web::post().to(authentication))
             )
     }).bind(config.rest_api_endpoint())
         .unwrap()
