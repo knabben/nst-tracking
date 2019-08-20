@@ -2,7 +2,9 @@ use protobuf;
 
 use sawtooth_sdk::messages::processor::TpProcessRequest;
 use sawtooth_sdk::processor::handler::{ApplyError, TransactionHandler,TransactionContext};
+use std::collections::HashMap;
 
+use crate::protobuf::Message;
 use crate::messages::*;
 use crate::addressing::*;
 
@@ -12,6 +14,76 @@ enum Action {
   CreateRecord(payload::CreateRecordAction),
   UpdateRecord(payload::UpdateRecordAction),
   TransferRecord(payload::TransferRecordAction),
+}
+
+
+pub struct TradeState<'a> {
+    context: &'a mut TransactionContext,
+}
+
+impl<'a> TradeState<'a> {
+    pub fn new(context: &'a mut TransactionContext) -> TradeState {
+        TradeState { context: context }
+    }
+
+    pub fn get_agent(&mut self, agent_id: &str) -> Result<Option<agent::Agent>, ApplyError> {
+        let address = make_agent_address(agent_id);
+        let d = self.context.get_state(vec![address])?;
+        match d {
+            Some(packed) => {
+                let agents: agent::AgentContainer =
+                    match protobuf::parse_from_bytes(packed.as_slice()) {
+                        Ok(agents) => agents,
+                        Err(_) => {
+                            return Err(ApplyError::InternalError(String::from(
+                                "Cannot deserialize agent container",
+                            )))
+                        }
+                    };
+
+                for agent in agents.get_entries() {
+                    if agent.public_key == agent_id {
+                        return Ok(Some(agent.clone()));
+                    }
+                }
+                Ok(None)
+            }
+            None => Ok(None),
+        }
+    }
+
+    pub fn set_agent(&mut self, agent_id: &str, agent: agent::Agent) -> Result<(), ApplyError> {
+        let address = make_agent_address(agent_id);
+        let d = self.context.get_state(vec![address.clone()])?;
+        let mut agents = match d {
+            Some(packed) => match protobuf::parse_from_bytes(packed.as_slice()) {
+                Ok(agents) => agents,
+                Err(_) => {
+                    return Err(ApplyError::InternalError(String::from(
+                        "Cannot deserialize agent container",
+                    )))
+                }
+            },
+            None => agent::AgentContainer::new(),
+        };
+
+        agents.entries.push(agent);
+        agents.entries.sort_by_key(|a| a.clone().public_key);
+        let serialized = match agents.write_to_bytes() {
+            Ok(serialized) => serialized,
+            Err(_) => {
+                return Err(ApplyError::InternalError(String::from(
+                    "Cannot serialize agent container",
+                )))
+            }
+        };
+        let mut sets = HashMap::new();
+        sets.insert(address, serialized);
+        self.context
+            .set_state(sets)
+            .map_err(|err| ApplyError::InternalError(format!("{}", err)))?;
+        Ok(())
+    }
 }
 
 struct TradePayload {
@@ -96,27 +168,30 @@ impl TradeTransactionHandler {
   fn _create_agent(
       &self,
       payload: payload::CreateAgentAction,
+      mut state: TradeState,
       signer: &str,
       timestamp: String,
   ) -> Result<(), ApplyError> {
       let name = payload.get_name();
-      // match state.get_agent(signer) {
-      //     Ok(Some(_)) => {
-      //         return Err(ApplyError::InvalidTransaction(format!(
-      //             "Agent already exists: {}",
-      //             name
-      //         )))
-      //     }
-      //     Ok(None) => (),
-      //     Err(err) => return Err(err),
-      // }
+      println!("Initial agent -- {}", signer);
+      match state.get_agent(signer) {
+          Ok(Some(_)) => {
+              return Err(ApplyError::InvalidTransaction(format!(
+                  "Agent already exists: {}",
+                  name
+              )))
+          }
+          Ok(None) => (),
+          Err(err) => return Err(err),
+      }
 
       let mut new_agent = agent::Agent::new();
       new_agent.set_public_key(signer.to_string());
       new_agent.set_name(name.to_string());
       new_agent.set_timestamp(0);
 
-      //state.set_agent(signer, new_agent)?;
+      state.set_agent(signer, new_agent)?;
+      println!("Created agent");
       Ok(())
   }
 }
@@ -136,7 +211,6 @@ impl TransactionHandler for TradeTransactionHandler {
 
   fn apply(&self, request: &TpProcessRequest, context: &mut TransactionContext) -> Result<(), ApplyError> {
     let payload = TradePayload::new(request.get_payload());
-    
     let payload = match payload {
       Err(e) => return Err(e),
       Ok(payload) => payload,
@@ -152,12 +226,12 @@ impl TransactionHandler for TradeTransactionHandler {
     };
 
     let signer = request.get_header().get_signer_public_key();
+    let state = TradeState::new(context);
+
     match payload.get_action() {
       Action::CreateAgent(agent_payload) => {
-        println!("{:?}", agent_payload);
-        self._create_agent(agent_payload, signer, payload.get_timestamp())
+        self._create_agent(agent_payload, state, signer, payload.get_timestamp())
       }
-
       _ => Ok(())
     }
   }

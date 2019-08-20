@@ -12,11 +12,13 @@ use handler::TradeTransactionHandler;
 
 
 fn main() {
-    let endpoint = &"tcp://sawtooth-validator:4004".to_string();
+    println!("Starting sawtooth validator");
+    
+    let endpoint = &"tcp://localhost:4004".to_string();
     let mut processor = TransactionProcessor::new(endpoint);
 
     let handler = TradeTransactionHandler::new();
-    
+
     processor.add_handler(&handler);
     processor.start();
 }
