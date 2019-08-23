@@ -11,14 +11,12 @@ export const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     alignItems: 'center',
   },
-
   paper: {
     marginTop: theme.spacing(8),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
-  
   container: {
     display: 'flex',
     flexWrap: 'wrap',
