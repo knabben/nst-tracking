@@ -6,29 +6,17 @@ import Tab from '@material-ui/core/Tab';
 import { useStyles } from './styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-const Menu = ({authenticated}) => {
+const Menu = () => {
   const classes = useStyles();
   const [value, setValue] = React.useState(0)
-
-  function handleChange(event, newValue) {
-    setValue(newValue);
-  }
+  const [authenticated, setAuthenticated] = React.useState(false)
 
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
-      
       <div className={classes.menu}>
-        <Tabs value={0} onChange={handleChange}>
-          { authenticated && 
-            <Tab value={0} label="Home" to="/" component={Link}/>
-          }
-          {
-            !authenticated && <div>
-              <Tab value={1} label="Signin" to="/signin" component={Link}/>
-              <Tab value={2} label="Signup" to="/signup" component={Link}/>
-            </div>
-          }
+        <Tabs value={1} onChange={(e, nv) => setValue(nv)}>
+          <Tab value={1} label="Signin" to="/signin" component={Link}/>
         </Tabs>
       </div>
     </Container>

@@ -3,7 +3,7 @@ import HomeContainer from "./containers/Home";
 
 import DevTools from './containers/DevTools'
 import Signup from './containers/Signup'
-import Signin from './containers/Signin'
+import SigninForm from './components/forms/signin'
 import { Provider } from 'react-redux'
 import { ConnectedRouter } from 'connected-react-router'
 
@@ -16,8 +16,8 @@ const Root = ({ store }) => (
     <ConnectedRouter history={history}>
       <Menu />
       <Route path="/" exact component={HomeContainer} />
-      <Route path="/signup" exact component={Signup} />
-      <Route path="/signin" exact component={Signin} />
+      <Route path="/signin" exact component={SigninForm} />
+      {/* <Route path="/signin" exact component={Signin} /> */}
       <DevTools />
     </ConnectedRouter>
   </Provider>
