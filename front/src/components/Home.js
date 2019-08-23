@@ -1,10 +1,13 @@
 import React from 'react';
-
 import './App.css';
+import { useSelector } from 'react-redux'
+import { isAuthenticated } from '../selectors/user'
 import Button from '@material-ui/core/Button';
 import { Redirect } from 'react-router'
 
-const Home = ({authenticated}) => {
+const Home = () => {
+  const authenticated = useSelector(isAuthenticated);
+
   return (
     !authenticated ? (
       <Redirect to="/signin" />

@@ -1,8 +1,9 @@
 import Home from '../components/Home'
+import { isAuthenticated } from '../selectors/user'
 import { connect } from 'react-redux'
 
 const mapStateToProps = (state) => ({
-  authenticated: false //state.login.hasOwnProperty("token")
+  authenticated: isAuthenticated(state),
 })
 
 const HomeContainer = connect(mapStateToProps)(Home);

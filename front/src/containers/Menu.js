@@ -1,9 +1,9 @@
 import Menu from '../components/Menu'
-import { getToken } from '../selectors/user'
+import { isAuthenticated } from '../selectors/user'
 import { connect } from 'react-redux'
 
 const mapStateToProps = (state) => ({
-  authenticated: getToken(state),
+  authenticated: isAuthenticated(state),
 })
 
 const MenuContainer = connect(mapStateToProps)(Menu);

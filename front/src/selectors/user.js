@@ -1,1 +1,1 @@
-export const getToken = state => state.user
+export const isAuthenticated = state => state.user.length > 1
