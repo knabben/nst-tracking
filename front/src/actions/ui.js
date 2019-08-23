@@ -1,5 +1,5 @@
 // action types
-export const SET_LOADER = 'SET_LOADER';
+export const SET_LOADER = 'LOADER';
 
 export const setLoader = ({state, feature}) => ({
   type: `${feature} ${SET_LOADER}`,

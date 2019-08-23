@@ -15,12 +15,15 @@ export const loginUser = ({username, password}) => ({
   },
 })
 
-export const registerUser = (payload) => ({
+export const registerUser = ({username, password}) => ({
   type: REGISTER_USER,
-  payload: payload,
+  payload: {
+    username,
+    password
+  }
 })
 
-export const setUser = ({user}) => ({
+export const setUser = ({token}) => ({
   type: SET_USER,
-  payload: user,
+  payload: token,
 })

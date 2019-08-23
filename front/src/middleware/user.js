@@ -1,4 +1,4 @@
-import { USER, LOGIN_USER, setUser } from '../actions/user'
+import { USER, LOGIN_USER, REGISTER_USER, setUser } from '../actions/user'
 import { API_SUCCESS, API_ERROR, apiRequest } from '../actions/api';
 import { setLoader } from '../actions/ui';
 import { setNotification } from '../actions/notification'
@@ -15,13 +15,17 @@ export const userMiddleware = () => (next) => (action) => {
       next(setLoader({state: true, feature: USER}))
       break;
 
+    case REGISTER_USER:
+        next(apiRequest({body: action.payload, method: 'POST', url: REGISTER_AGENT_URL, feature: USER}))
+        next(setLoader({state: true, feature: USER}))
+        break;
+        
     case `${USER} ${API_SUCCESS}`:
       next(setUser({token: action.payload.token}))
       next(setLoader({state: false, feature: USER}))
       break;
 
     case `${USER} ${API_ERROR}`:
-      console.log(action.payload)
       next(setNotification({message: action.payload.message, feature: USER}))
       next(setLoader({state: false, feature: USER}))
       break;

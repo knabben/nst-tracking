@@ -9,7 +9,7 @@ export const apiRequest = ({body, method, url, feature}) => ({
   meta: {method, url, feature}
 })
 
-export const apiSuccess = ({response, feature}) => ({
+export const apiSuccess = (response, feature) => ({
   type: `${feature} ${API_SUCCESS}`,
   payload: response,
   meta: {feature}

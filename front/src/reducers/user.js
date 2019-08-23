@@ -4,7 +4,7 @@ const initState = [];
 
 export const userReducer = (user = initState, action) => {
   switch (action.type) {
-    case action.type.includes(SET_USER):
+    case SET_USER:
       return action.payload;
 
     default:
