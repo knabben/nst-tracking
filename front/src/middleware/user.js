@@ -16,9 +16,9 @@ export const userMiddleware = () => (next) => (action) => {
       break;
 
     case REGISTER_USER:
-        next(apiRequest({body: action.payload, method: 'POST', url: REGISTER_AGENT_URL, feature: USER}))
-        next(setLoader({state: true, feature: USER}))
-        break;
+      next(apiRequest({body: action.payload, method: 'POST', url: REGISTER_AGENT_URL, feature: USER}))
+      next(setLoader({state: true, feature: USER}))
+      break;
         
     case `${USER} ${API_SUCCESS}`:
       next(setUser({token: action.payload.token}))
