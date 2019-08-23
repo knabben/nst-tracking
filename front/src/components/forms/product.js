@@ -9,8 +9,13 @@ import Input from '@material-ui/core/Input';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import { registerProduct } from '../../actions/product';
 
-const initialValues = {};
+const initialValues = {
+  title: "",
+  latitude: "",
+  longitude: "",
+};
 
 const ProductForm = () => {
   const classes = useStyles();
@@ -20,7 +25,7 @@ const ProductForm = () => {
     <Formik
       initialValues={initialValues}
       onSubmit={(values, actions) => {
-        dispatch(loginUser(values))
+        dispatch(registerProduct(values))
         actions.setSubmitting(false)
       }}
     >
