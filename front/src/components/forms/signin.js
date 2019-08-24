@@ -1,9 +1,10 @@
 import React from 'react';
 import { Container } from '@material-ui/core';
-
+import Snackbar from '@material-ui/core/Snackbar';
 import { Formik } from 'formik';
 import { useStyles } from '../styles';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { getNotifications } from '../../selectors/notification'
 import { loginUser } from '../../actions/user'
 import Input from '@material-ui/core/Input';
 import Button from '@material-ui/core/Button';
@@ -19,15 +20,39 @@ const initialValues = {
 const SigninForm = () => {
   const classes = useStyles();
   const dispatch = useDispatch()
+  const notifications = useSelector(getNotifications)
+
+  const handleClose = () => {
+
+  }
 
   return (
-    <Formik
-      initialValues={initialValues}
-      onSubmit={(values, actions) => {
-        dispatch(loginUser(values))
-        actions.setSubmitting(false)
-      }}
-    >
+    <div>
+      { 
+        notifications.map( (notification) => (
+          <Snackbar
+            key={notification.id}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            open={true}
+            autoHideDuration={6000}
+            onClose={handleClose}
+            ContentProps={{
+              'aria-describedby': 'message-id',
+            }}
+            message={<span id="message-id">{notification.message}</span>}
+          />
+        ))
+      }
+      <Formik
+        initialValues={initialValues}
+        onSubmit={(values, actions) => {
+          dispatch(loginUser(values))
+          actions.setSubmitting(false)
+        }}
+      >
       {({
         handleSubmit,
         handleChange,
@@ -77,7 +102,8 @@ const SigninForm = () => {
         </div>
       </Container>
       )}
-  </Formik>
+    </Formik>
+  </div>
   )
 }
 
