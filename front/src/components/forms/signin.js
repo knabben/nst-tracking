@@ -1,6 +1,6 @@
 import React from 'react';
-import { Container } from '@material-ui/core';
 import Snackbar from '@material-ui/core/Snackbar';
+import { Container } from '@material-ui/core';
 import { Formik } from 'formik';
 import { useStyles } from '../styles';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,10 +22,6 @@ const SigninForm = () => {
   const dispatch = useDispatch()
   const notifications = useSelector(getNotifications)
 
-  const handleClose = () => {
-
-  }
-
   return (
     <div>
       { 
@@ -38,7 +34,6 @@ const SigninForm = () => {
             }}
             open={true}
             autoHideDuration={6000}
-            onClose={handleClose}
             ContentProps={{
               'aria-describedby': 'message-id',
             }}
