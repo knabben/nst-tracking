@@ -9,10 +9,12 @@ import { apiMiddleware } from '../middleware/api';
 import { userMiddleware } from '../middleware/user';
 import { productMiddleware } from '../middleware/product';
 import { notificationMiddleware } from '../middleware/notifications';
+import { routerDispatchMiddleware } from '../middleware/router';
 
 export const history = createBrowserHistory()
 
 const featureMiddleware = [
+  routerDispatchMiddleware,
   userMiddleware,
   productMiddleware
 ]
