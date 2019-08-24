@@ -40,7 +40,7 @@ const SigninForm = () => {
         <Container component="main" maxWidth="xs">
         <CssBaseline />
         <div className={classes.paper}>
-          <Typography component="h1" variant="h5"> SIGNIN </Typography>
+          <Typography component="h1" variant="h5"> Signin </Typography>
           <form onSubmit={handleSubmit} noValidate autoComplete="off">
             <Input
               fullWidth
