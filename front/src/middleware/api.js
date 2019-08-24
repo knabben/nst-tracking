@@ -11,7 +11,14 @@ export const apiMiddleware = ({dispatch}) => next => action => {
       headers: { 'Content-Type': 'application/json' },
       body:  JSON.stringify(action.payload),
     })
-      .then(response => response.json())
+      .then(response => {
+        const data = response.json()
+        if (response.status == 200) {
+          return data
+        } else {
+          dispatch(apiError(data, feature))
+        }
+      })
       .then(data => dispatch(apiSuccess(data, feature)))
       .catch(error => dispatch(apiError(error, feature)))
   }
