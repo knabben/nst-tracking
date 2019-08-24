@@ -16,13 +16,11 @@ export const userMiddleware = ({dispatch}) => (next) => (action) => {
     case LOGIN_USER:
       next(apiRequest({body: action.payload, method: 'POST', url: LOGIN_AGENT_URL, feature: USER}))
       next(setLoader({state: true, feature: USER}))
-      dispatch(push('/home'));
       break;
 
     case REGISTER_USER:
       next(apiRequest({body: action.payload, method: 'POST', url: REGISTER_AGENT_URL, feature: USER}))
       next(setLoader({state: true, feature: USER}))
-      dispatch(push('/home'));
       break;
         
     case `${USER} ${API_SUCCESS}`:

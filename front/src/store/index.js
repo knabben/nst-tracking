@@ -8,6 +8,7 @@ import { loggerMiddleware } from '../middleware/logger';
 import { apiMiddleware } from '../middleware/api';
 import { userMiddleware } from '../middleware/user';
 import { productMiddleware } from '../middleware/product';
+import { notificationMiddleware } from '../middleware/notifications';
 
 export const history = createBrowserHistory()
 
@@ -18,6 +19,7 @@ const featureMiddleware = [
 
 const coreMiddleware = [
   apiMiddleware,
+  notificationMiddleware,
   loggerMiddleware
 ]
 
