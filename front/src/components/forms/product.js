@@ -16,6 +16,7 @@ const initialValues = {
   record_id: "",
   latitude: 0,
   longitude: 0,
+  price: 0,
 };
 
 const ProductForm = () => {
@@ -66,6 +67,17 @@ const ProductForm = () => {
               label="identifier"
             />
             {errors.record_id && touched.record_id && errors.record_id}
+            <Input
+              fullWidth
+              placeholder="Initial price ($)"
+              className={classes.input}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.record_id}
+              id="price"
+              label="price"
+            />
+            {errors.price && touched.price && errors.price}
             <Input
               fullWidth
               type="number"

@@ -37,10 +37,12 @@ message Record {
     // The user-defined natural key which identifies the object in the
     // real world (for example a serial number)
     string record_id = 1;
+    string title = 2;
+    uint64 price = 3;
 
     // Ordered oldest to newest by timestamp
-    repeated Owner owners = 2;
-    repeated Location locations = 3;
+    repeated Owner owners = 4;
+    repeated Location locations = 5;
 }
 
 
