@@ -174,6 +174,7 @@ impl TradeTransactionHandler {
   ) -> Result<(), ApplyError> {
       let name = payload.get_name();
       println!("Initial agent -- {}", signer);
+      
       match state.get_agent(signer) {
           Ok(Some(_)) => {
               return Err(ApplyError::InvalidTransaction(format!(

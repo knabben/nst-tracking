@@ -31,6 +31,7 @@ use crate::database::run_all_migrations;
 use actix_cors::Cors;
 use actix_web::{http, web, App, HttpServer};
 use routes::agents::{create_agent, authentication};
+use routes::products::{create_products};
 
 pub struct AppState {
     sawtooth_connection: SawtoothConnection,
@@ -108,6 +109,7 @@ fn run() -> Result<(), Box<dyn Error>> {
             .service(
                 web::scope("/api")
                     .route("/agent", web::post().to(create_agent))
+                    .route("/product", web::post().to(create_products))
                     .route("/authentication", web::post().to(authentication))
             )
     }).bind(config.rest_api_endpoint())

@@ -13,8 +13,9 @@ import { registerProduct } from '../../actions/product';
 
 const initialValues = {
   title: "",
-  latitude: "",
-  longitude: "",
+  record_id: "",
+  latitude: 0,
+  longitude: 0,
 };
 
 const ProductForm = () => {
@@ -56,6 +57,18 @@ const ProductForm = () => {
             {errors.title && touched.title && errors.title}
             <Input
               fullWidth
+              placeholder="Identifier"
+              className={classes.input}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.record_id}
+              id="record_id"
+              label="identifier"
+            />
+            {errors.record_id && touched.record_id && errors.record_id}
+            <Input
+              fullWidth
+              type="number"
               placeholder="Latitude"
               className={classes.input}
               onChange={handleChange}
@@ -67,6 +80,7 @@ const ProductForm = () => {
             {errors.latitude && touched.latitude && errors.latitude}
             <Input
               fullWidth
+              type="number"
               placeholder="Longitude"
               className={classes.input}
               onChange={handleChange}

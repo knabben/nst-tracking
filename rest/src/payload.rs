@@ -688,6 +688,7 @@ impl ::protobuf::reflect::ProtobufValue for CreateAgentAction {
 pub struct CreateRecordAction {
     // message fields
     pub record_id: ::std::string::String,
+    pub title: ::std::string::String,
     pub latitude: i64,
     pub longitude: i64,
     // special fields
@@ -732,7 +733,33 @@ impl CreateRecordAction {
         ::std::mem::replace(&mut self.record_id, ::std::string::String::new())
     }
 
-    // sint64 latitude = 2;
+    // string title = 2;
+
+
+    pub fn get_title(&self) -> &str {
+        &self.title
+    }
+    pub fn clear_title(&mut self) {
+        self.title.clear();
+    }
+
+    // Param is passed by value, moved
+    pub fn set_title(&mut self, v: ::std::string::String) {
+        self.title = v;
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_title(&mut self) -> &mut ::std::string::String {
+        &mut self.title
+    }
+
+    // Take field
+    pub fn take_title(&mut self) -> ::std::string::String {
+        ::std::mem::replace(&mut self.title, ::std::string::String::new())
+    }
+
+    // sint64 latitude = 3;
 
 
     pub fn get_latitude(&self) -> i64 {
@@ -747,7 +774,7 @@ impl CreateRecordAction {
         self.latitude = v;
     }
 
-    // sint64 longitude = 3;
+    // sint64 longitude = 4;
 
 
     pub fn get_longitude(&self) -> i64 {
@@ -776,13 +803,16 @@ impl ::protobuf::Message for CreateRecordAction {
                     ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.record_id)?;
                 },
                 2 => {
+                    ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.title)?;
+                },
+                3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_sint64()?;
                     self.latitude = tmp;
                 },
-                3 => {
+                4 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
@@ -804,11 +834,14 @@ impl ::protobuf::Message for CreateRecordAction {
         if !self.record_id.is_empty() {
             my_size += ::protobuf::rt::string_size(1, &self.record_id);
         }
+        if !self.title.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.title);
+        }
         if self.latitude != 0 {
-            my_size += ::protobuf::rt::value_varint_zigzag_size(2, self.latitude);
+            my_size += ::protobuf::rt::value_varint_zigzag_size(3, self.latitude);
         }
         if self.longitude != 0 {
-            my_size += ::protobuf::rt::value_varint_zigzag_size(3, self.longitude);
+            my_size += ::protobuf::rt::value_varint_zigzag_size(4, self.longitude);
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
         self.cached_size.set(my_size);
@@ -819,11 +852,14 @@ impl ::protobuf::Message for CreateRecordAction {
         if !self.record_id.is_empty() {
             os.write_string(1, &self.record_id)?;
         }
+        if !self.title.is_empty() {
+            os.write_string(2, &self.title)?;
+        }
         if self.latitude != 0 {
-            os.write_sint64(2, self.latitude)?;
+            os.write_sint64(3, self.latitude)?;
         }
         if self.longitude != 0 {
-            os.write_sint64(3, self.longitude)?;
+            os.write_sint64(4, self.longitude)?;
         }
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -872,6 +908,11 @@ impl ::protobuf::Message for CreateRecordAction {
                     |m: &CreateRecordAction| { &m.record_id },
                     |m: &mut CreateRecordAction| { &mut m.record_id },
                 ));
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
+                    "title",
+                    |m: &CreateRecordAction| { &m.title },
+                    |m: &mut CreateRecordAction| { &mut m.title },
+                ));
                 fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeSint64>(
                     "latitude",
                     |m: &CreateRecordAction| { &m.latitude },
@@ -905,6 +946,7 @@ impl ::protobuf::Message for CreateRecordAction {
 impl ::protobuf::Clear for CreateRecordAction {
     fn clear(&mut self) {
         self.record_id.clear();
+        self.title.clear();
         self.latitude = 0;
         self.longitude = 0;
         self.unknown_fields.clear();
@@ -1384,15 +1426,15 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x18\x06\x20\x01(\tR\ttimestamp\"U\n\x06Action\x12\x10\n\x0cCREATE_AGENT\
     \x10\0\x12\x11\n\rCREATE_RECORD\x10\x01\x12\x11\n\rUPDATE_RECORD\x10\x02\
     \x12\x13\n\x0fTRANSFER_RECORD\x10\x03\"'\n\x11CreateAgentAction\x12\x12\
-    \n\x04name\x18\x01\x20\x01(\tR\x04name\"k\n\x12CreateRecordAction\x12\
-    \x1b\n\trecord_id\x18\x01\x20\x01(\tR\x08recordId\x12\x1a\n\x08latitude\
-    \x18\x02\x20\x01(\x12R\x08latitude\x12\x1c\n\tlongitude\x18\x03\x20\x01(\
-    \x12R\tlongitude\"k\n\x12UpdateRecordAction\x12\x1b\n\trecord_id\x18\x01\
-    \x20\x01(\tR\x08recordId\x12\x1a\n\x08latitude\x18\x02\x20\x01(\x12R\x08\
-    latitude\x12\x1c\n\tlongitude\x18\x03\x20\x01(\x12R\tlongitude\"\\\n\x14\
-    TransferRecordAction\x12\x1b\n\trecord_id\x18\x01\x20\x01(\tR\x08recordI\
-    d\x12'\n\x0freceiving_agent\x18\x02\x20\x01(\tR\x0ereceivingAgentb\x06pr\
-    oto3\
+    \n\x04name\x18\x01\x20\x01(\tR\x04name\"\x81\x01\n\x12CreateRecordAction\
+    \x12\x1b\n\trecord_id\x18\x01\x20\x01(\tR\x08recordId\x12\x14\n\x05title\
+    \x18\x02\x20\x01(\tR\x05title\x12\x1a\n\x08latitude\x18\x03\x20\x01(\x12\
+    R\x08latitude\x12\x1c\n\tlongitude\x18\x04\x20\x01(\x12R\tlongitude\"k\n\
+    \x12UpdateRecordAction\x12\x1b\n\trecord_id\x18\x01\x20\x01(\tR\x08recor\
+    dId\x12\x1a\n\x08latitude\x18\x02\x20\x01(\x12R\x08latitude\x12\x1c\n\tl\
+    ongitude\x18\x03\x20\x01(\x12R\tlongitude\"\\\n\x14TransferRecordAction\
+    \x12\x1b\n\trecord_id\x18\x01\x20\x01(\tR\x08recordId\x12'\n\x0freceivin\
+    g_agent\x18\x02\x20\x01(\tR\x0ereceivingAgentb\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {
