@@ -21,7 +21,8 @@ message SimpleSupplyPayload{
         CREATE_AGENT = 0;
         CREATE_RECORD = 1;
         UPDATE_RECORD = 2;
-        TRANSFER_RECORD = 3;
+        CREATE_BID = 3;
+        TRANSFER_RECORD = 4;
     }
 
     // Whether the payload contains a create agent, create record,
@@ -33,10 +34,11 @@ message SimpleSupplyPayload{
     CreateAgentAction create_agent = 2;
     CreateRecordAction create_record = 3;
     UpdateRecordAction update_record = 4;
-    TransferRecordAction transfer_record = 5;
+    CreateBidAction create_bid = 5;
+    TransferRecordAction transfer_record = 6;
 
     // Approximately when transaction was submitted, as a Unix UTC timestamp
-    string timestamp = 6;
+    string timestamp = 7;
 }
 
 
@@ -51,9 +53,15 @@ message CreateRecordAction {
     // real world (for example a serial number)
     string record_id = 1;
 
+    // title is a description of the product
+    string title = 2;
+
+    // initial price of the record
+    uint64 price = 3;
+
     // Coordinates are expected to be in millionths of a degree
-    sint64 latitude = 2;
-    sint64 longitude = 3;
+    sint64 latitude = 4;
+    sint64 longitude = 5;
 }
 
 
@@ -66,6 +74,12 @@ message UpdateRecordAction {
     sint64 longitude = 3;
 }
 
+message CreateBidAction {
+    // The id of the record being updated
+    string record_id = 1;
+
+    sint64 price = 2;
+}
 
 message TransferRecordAction {
     // The id of the record for the ownership transfer
@@ -73,4 +87,7 @@ message TransferRecordAction {
 
     // The public key of the agent to which the record will be transferred
     string receiving_agent = 2;
+
+    // final price of the transfer
+    sint64 price = 3;
 }
