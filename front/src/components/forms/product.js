@@ -1,15 +1,14 @@
 import React from 'react';
 import { Container } from '@material-ui/core';
-
 import { Formik } from 'formik';
 import { useStyles } from '../styles';
-import { useDispatch } from 'react-redux';
-import { loginUser } from '../../actions/user'
+import { useDispatch, useSelector } from 'react-redux';
 import Input from '@material-ui/core/Input';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { registerProduct } from '../../actions/product';
+import { getToken } from '../../selectors/user';
 
 const initialValues = {
   title: "",
@@ -21,13 +20,14 @@ const initialValues = {
 
 const ProductForm = () => {
   const classes = useStyles();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const token = useSelector(getToken);
 
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={(values, actions) => {
-        dispatch(registerProduct(values))
+        dispatch(registerProduct(values, token))
         actions.setSubmitting(false)
       }}
     >
@@ -73,7 +73,7 @@ const ProductForm = () => {
               className={classes.input}
               onChange={handleChange}
               onBlur={handleBlur}
-              value={values.record_id}
+              value={values.price}
               id="price"
               label="price"
             />

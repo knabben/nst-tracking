@@ -11,7 +11,7 @@ export const productMiddleware = ({dispatch}) => (next) => (action) => {
 
   switch (action.type) {
     case REGISTER_PRODUCT:
-      next(apiRequest({body: action.payload, method: 'POST', url: PRODUCT_URL, feature: PRODUCT}))
+      next(apiRequest({body: action.payload, method: 'POST', url: PRODUCT_URL, token: action.meta.token, feature: PRODUCT}))
       next(setLoader({state: true, feature: PRODUCT}))
       break;
   }
