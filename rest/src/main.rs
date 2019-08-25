@@ -103,7 +103,7 @@ fn run() -> Result<(), Box<dyn Error>> {
                 Cors::new()
                 .allowed_origin("http://localhost:3000")
                 .allowed_methods(vec!["GET", "POST"])
-                .allowed_header(http::header::CONTENT_TYPE)
+                .allowed_headers(vec![http::header::CONTENT_TYPE, http::header::AUTHORIZATION])
                 .max_age(3600)
             )
             .service(
