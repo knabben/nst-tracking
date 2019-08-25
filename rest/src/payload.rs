@@ -33,6 +33,7 @@ pub struct SimpleSupplyPayload {
     pub create_agent: ::protobuf::SingularPtrField<CreateAgentAction>,
     pub create_record: ::protobuf::SingularPtrField<CreateRecordAction>,
     pub update_record: ::protobuf::SingularPtrField<UpdateRecordAction>,
+    pub create_bid: ::protobuf::SingularPtrField<CreateBidAction>,
     pub transfer_record: ::protobuf::SingularPtrField<TransferRecordAction>,
     pub timestamp: ::std::string::String,
     // special fields
@@ -165,7 +166,40 @@ impl SimpleSupplyPayload {
         self.update_record.take().unwrap_or_else(|| UpdateRecordAction::new())
     }
 
-    // .TransferRecordAction transfer_record = 5;
+    // .CreateBidAction create_bid = 5;
+
+
+    pub fn get_create_bid(&self) -> &CreateBidAction {
+        self.create_bid.as_ref().unwrap_or_else(|| CreateBidAction::default_instance())
+    }
+    pub fn clear_create_bid(&mut self) {
+        self.create_bid.clear();
+    }
+
+    pub fn has_create_bid(&self) -> bool {
+        self.create_bid.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_create_bid(&mut self, v: CreateBidAction) {
+        self.create_bid = ::protobuf::SingularPtrField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_create_bid(&mut self) -> &mut CreateBidAction {
+        if self.create_bid.is_none() {
+            self.create_bid.set_default();
+        }
+        self.create_bid.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_create_bid(&mut self) -> CreateBidAction {
+        self.create_bid.take().unwrap_or_else(|| CreateBidAction::new())
+    }
+
+    // .TransferRecordAction transfer_record = 6;
 
 
     pub fn get_transfer_record(&self) -> &TransferRecordAction {
@@ -198,7 +232,7 @@ impl SimpleSupplyPayload {
         self.transfer_record.take().unwrap_or_else(|| TransferRecordAction::new())
     }
 
-    // string timestamp = 6;
+    // string timestamp = 7;
 
 
     pub fn get_timestamp(&self) -> &str {
@@ -242,6 +276,11 @@ impl ::protobuf::Message for SimpleSupplyPayload {
                 return false;
             }
         };
+        for v in &self.create_bid {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
         for v in &self.transfer_record {
             if !v.is_initialized() {
                 return false;
@@ -267,9 +306,12 @@ impl ::protobuf::Message for SimpleSupplyPayload {
                     ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.update_record)?;
                 },
                 5 => {
-                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.transfer_record)?;
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.create_bid)?;
                 },
                 6 => {
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.transfer_record)?;
+                },
+                7 => {
                     ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.timestamp)?;
                 },
                 _ => {
@@ -299,12 +341,16 @@ impl ::protobuf::Message for SimpleSupplyPayload {
             let len = v.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         }
+        if let Some(ref v) = self.create_bid.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        }
         if let Some(ref v) = self.transfer_record.as_ref() {
             let len = v.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         }
         if !self.timestamp.is_empty() {
-            my_size += ::protobuf::rt::string_size(6, &self.timestamp);
+            my_size += ::protobuf::rt::string_size(7, &self.timestamp);
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
         self.cached_size.set(my_size);
@@ -330,13 +376,18 @@ impl ::protobuf::Message for SimpleSupplyPayload {
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
         }
-        if let Some(ref v) = self.transfer_record.as_ref() {
+        if let Some(ref v) = self.create_bid.as_ref() {
             os.write_tag(5, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
         }
+        if let Some(ref v) = self.transfer_record.as_ref() {
+            os.write_tag(6, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
+        }
         if !self.timestamp.is_empty() {
-            os.write_string(6, &self.timestamp)?;
+            os.write_string(7, &self.timestamp)?;
         }
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -400,6 +451,11 @@ impl ::protobuf::Message for SimpleSupplyPayload {
                     |m: &SimpleSupplyPayload| { &m.update_record },
                     |m: &mut SimpleSupplyPayload| { &mut m.update_record },
                 ));
+                fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<CreateBidAction>>(
+                    "create_bid",
+                    |m: &SimpleSupplyPayload| { &m.create_bid },
+                    |m: &mut SimpleSupplyPayload| { &mut m.create_bid },
+                ));
                 fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<TransferRecordAction>>(
                     "transfer_record",
                     |m: &SimpleSupplyPayload| { &m.transfer_record },
@@ -436,6 +492,7 @@ impl ::protobuf::Clear for SimpleSupplyPayload {
         self.create_agent.clear();
         self.create_record.clear();
         self.update_record.clear();
+        self.create_bid.clear();
         self.transfer_record.clear();
         self.timestamp.clear();
         self.unknown_fields.clear();
@@ -459,7 +516,8 @@ pub enum SimpleSupplyPayload_Action {
     CREATE_AGENT = 0,
     CREATE_RECORD = 1,
     UPDATE_RECORD = 2,
-    TRANSFER_RECORD = 3,
+    CREATE_BID = 3,
+    TRANSFER_RECORD = 4,
 }
 
 impl ::protobuf::ProtobufEnum for SimpleSupplyPayload_Action {
@@ -472,7 +530,8 @@ impl ::protobuf::ProtobufEnum for SimpleSupplyPayload_Action {
             0 => ::std::option::Option::Some(SimpleSupplyPayload_Action::CREATE_AGENT),
             1 => ::std::option::Option::Some(SimpleSupplyPayload_Action::CREATE_RECORD),
             2 => ::std::option::Option::Some(SimpleSupplyPayload_Action::UPDATE_RECORD),
-            3 => ::std::option::Option::Some(SimpleSupplyPayload_Action::TRANSFER_RECORD),
+            3 => ::std::option::Option::Some(SimpleSupplyPayload_Action::CREATE_BID),
+            4 => ::std::option::Option::Some(SimpleSupplyPayload_Action::TRANSFER_RECORD),
             _ => ::std::option::Option::None
         }
     }
@@ -482,6 +541,7 @@ impl ::protobuf::ProtobufEnum for SimpleSupplyPayload_Action {
             SimpleSupplyPayload_Action::CREATE_AGENT,
             SimpleSupplyPayload_Action::CREATE_RECORD,
             SimpleSupplyPayload_Action::UPDATE_RECORD,
+            SimpleSupplyPayload_Action::CREATE_BID,
             SimpleSupplyPayload_Action::TRANSFER_RECORD,
         ];
         values
@@ -689,6 +749,7 @@ pub struct CreateRecordAction {
     // message fields
     pub record_id: ::std::string::String,
     pub title: ::std::string::String,
+    pub price: u64,
     pub latitude: i64,
     pub longitude: i64,
     // special fields
@@ -759,7 +820,22 @@ impl CreateRecordAction {
         ::std::mem::replace(&mut self.title, ::std::string::String::new())
     }
 
-    // sint64 latitude = 3;
+    // uint64 price = 3;
+
+
+    pub fn get_price(&self) -> u64 {
+        self.price
+    }
+    pub fn clear_price(&mut self) {
+        self.price = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_price(&mut self, v: u64) {
+        self.price = v;
+    }
+
+    // sint64 latitude = 4;
 
 
     pub fn get_latitude(&self) -> i64 {
@@ -774,7 +850,7 @@ impl CreateRecordAction {
         self.latitude = v;
     }
 
-    // sint64 longitude = 4;
+    // sint64 longitude = 5;
 
 
     pub fn get_longitude(&self) -> i64 {
@@ -809,10 +885,17 @@ impl ::protobuf::Message for CreateRecordAction {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
+                    let tmp = is.read_uint64()?;
+                    self.price = tmp;
+                },
+                4 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
                     let tmp = is.read_sint64()?;
                     self.latitude = tmp;
                 },
-                4 => {
+                5 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
@@ -837,11 +920,14 @@ impl ::protobuf::Message for CreateRecordAction {
         if !self.title.is_empty() {
             my_size += ::protobuf::rt::string_size(2, &self.title);
         }
+        if self.price != 0 {
+            my_size += ::protobuf::rt::value_size(3, self.price, ::protobuf::wire_format::WireTypeVarint);
+        }
         if self.latitude != 0 {
-            my_size += ::protobuf::rt::value_varint_zigzag_size(3, self.latitude);
+            my_size += ::protobuf::rt::value_varint_zigzag_size(4, self.latitude);
         }
         if self.longitude != 0 {
-            my_size += ::protobuf::rt::value_varint_zigzag_size(4, self.longitude);
+            my_size += ::protobuf::rt::value_varint_zigzag_size(5, self.longitude);
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
         self.cached_size.set(my_size);
@@ -855,11 +941,14 @@ impl ::protobuf::Message for CreateRecordAction {
         if !self.title.is_empty() {
             os.write_string(2, &self.title)?;
         }
+        if self.price != 0 {
+            os.write_uint64(3, self.price)?;
+        }
         if self.latitude != 0 {
-            os.write_sint64(3, self.latitude)?;
+            os.write_sint64(4, self.latitude)?;
         }
         if self.longitude != 0 {
-            os.write_sint64(4, self.longitude)?;
+            os.write_sint64(5, self.longitude)?;
         }
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -913,6 +1002,11 @@ impl ::protobuf::Message for CreateRecordAction {
                     |m: &CreateRecordAction| { &m.title },
                     |m: &mut CreateRecordAction| { &mut m.title },
                 ));
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint64>(
+                    "price",
+                    |m: &CreateRecordAction| { &m.price },
+                    |m: &mut CreateRecordAction| { &mut m.price },
+                ));
                 fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeSint64>(
                     "latitude",
                     |m: &CreateRecordAction| { &m.latitude },
@@ -947,6 +1041,7 @@ impl ::protobuf::Clear for CreateRecordAction {
     fn clear(&mut self) {
         self.record_id.clear();
         self.title.clear();
+        self.price = 0;
         self.latitude = 0;
         self.longitude = 0;
         self.unknown_fields.clear();
@@ -1205,10 +1300,215 @@ impl ::protobuf::reflect::ProtobufValue for UpdateRecordAction {
 }
 
 #[derive(PartialEq,Clone,Default)]
+pub struct CreateBidAction {
+    // message fields
+    pub record_id: ::std::string::String,
+    pub price: i64,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a CreateBidAction {
+    fn default() -> &'a CreateBidAction {
+        <CreateBidAction as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl CreateBidAction {
+    pub fn new() -> CreateBidAction {
+        ::std::default::Default::default()
+    }
+
+    // string record_id = 1;
+
+
+    pub fn get_record_id(&self) -> &str {
+        &self.record_id
+    }
+    pub fn clear_record_id(&mut self) {
+        self.record_id.clear();
+    }
+
+    // Param is passed by value, moved
+    pub fn set_record_id(&mut self, v: ::std::string::String) {
+        self.record_id = v;
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_record_id(&mut self) -> &mut ::std::string::String {
+        &mut self.record_id
+    }
+
+    // Take field
+    pub fn take_record_id(&mut self) -> ::std::string::String {
+        ::std::mem::replace(&mut self.record_id, ::std::string::String::new())
+    }
+
+    // sint64 price = 2;
+
+
+    pub fn get_price(&self) -> i64 {
+        self.price
+    }
+    pub fn clear_price(&mut self) {
+        self.price = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_price(&mut self, v: i64) {
+        self.price = v;
+    }
+}
+
+impl ::protobuf::Message for CreateBidAction {
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.record_id)?;
+                },
+                2 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_sint64()?;
+                    self.price = tmp;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if !self.record_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.record_id);
+        }
+        if self.price != 0 {
+            my_size += ::protobuf::rt::value_varint_zigzag_size(2, self.price);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        if !self.record_id.is_empty() {
+            os.write_string(1, &self.record_id)?;
+        }
+        if self.price != 0 {
+            os.write_sint64(2, self.price)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &::std::any::Any {
+        self as &::std::any::Any
+    }
+    fn as_any_mut(&mut self) -> &mut ::std::any::Any {
+        self as &mut ::std::any::Any
+    }
+    fn into_any(self: Box<Self>) -> ::std::boxed::Box<::std::any::Any> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> CreateBidAction {
+        CreateBidAction::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
+        };
+        unsafe {
+            descriptor.get(|| {
+                let mut fields = ::std::vec::Vec::new();
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
+                    "record_id",
+                    |m: &CreateBidAction| { &m.record_id },
+                    |m: &mut CreateBidAction| { &mut m.record_id },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeSint64>(
+                    "price",
+                    |m: &CreateBidAction| { &m.price },
+                    |m: &mut CreateBidAction| { &mut m.price },
+                ));
+                ::protobuf::reflect::MessageDescriptor::new::<CreateBidAction>(
+                    "CreateBidAction",
+                    fields,
+                    file_descriptor_proto()
+                )
+            })
+        }
+    }
+
+    fn default_instance() -> &'static CreateBidAction {
+        static mut instance: ::protobuf::lazy::Lazy<CreateBidAction> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const CreateBidAction,
+        };
+        unsafe {
+            instance.get(CreateBidAction::new)
+        }
+    }
+}
+
+impl ::protobuf::Clear for CreateBidAction {
+    fn clear(&mut self) {
+        self.record_id.clear();
+        self.price = 0;
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for CreateBidAction {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for CreateBidAction {
+    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
+        ::protobuf::reflect::ProtobufValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
 pub struct TransferRecordAction {
     // message fields
     pub record_id: ::std::string::String,
     pub receiving_agent: ::std::string::String,
+    pub price: i64,
     // special fields
     pub unknown_fields: ::protobuf::UnknownFields,
     pub cached_size: ::protobuf::CachedSize,
@@ -1276,6 +1576,21 @@ impl TransferRecordAction {
     pub fn take_receiving_agent(&mut self) -> ::std::string::String {
         ::std::mem::replace(&mut self.receiving_agent, ::std::string::String::new())
     }
+
+    // sint64 price = 3;
+
+
+    pub fn get_price(&self) -> i64 {
+        self.price
+    }
+    pub fn clear_price(&mut self) {
+        self.price = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_price(&mut self, v: i64) {
+        self.price = v;
+    }
 }
 
 impl ::protobuf::Message for TransferRecordAction {
@@ -1292,6 +1607,13 @@ impl ::protobuf::Message for TransferRecordAction {
                 },
                 2 => {
                     ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.receiving_agent)?;
+                },
+                3 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_sint64()?;
+                    self.price = tmp;
                 },
                 _ => {
                     ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
@@ -1311,6 +1633,9 @@ impl ::protobuf::Message for TransferRecordAction {
         if !self.receiving_agent.is_empty() {
             my_size += ::protobuf::rt::string_size(2, &self.receiving_agent);
         }
+        if self.price != 0 {
+            my_size += ::protobuf::rt::value_varint_zigzag_size(3, self.price);
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
         self.cached_size.set(my_size);
         my_size
@@ -1322,6 +1647,9 @@ impl ::protobuf::Message for TransferRecordAction {
         }
         if !self.receiving_agent.is_empty() {
             os.write_string(2, &self.receiving_agent)?;
+        }
+        if self.price != 0 {
+            os.write_sint64(3, self.price)?;
         }
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -1375,6 +1703,11 @@ impl ::protobuf::Message for TransferRecordAction {
                     |m: &TransferRecordAction| { &m.receiving_agent },
                     |m: &mut TransferRecordAction| { &mut m.receiving_agent },
                 ));
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeSint64>(
+                    "price",
+                    |m: &TransferRecordAction| { &m.price },
+                    |m: &mut TransferRecordAction| { &mut m.price },
+                ));
                 ::protobuf::reflect::MessageDescriptor::new::<TransferRecordAction>(
                     "TransferRecordAction",
                     fields,
@@ -1399,6 +1732,7 @@ impl ::protobuf::Clear for TransferRecordAction {
     fn clear(&mut self) {
         self.record_id.clear();
         self.receiving_agent.clear();
+        self.price = 0;
         self.unknown_fields.clear();
     }
 }
@@ -1416,25 +1750,30 @@ impl ::protobuf::reflect::ProtobufValue for TransferRecordAction {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\rpayload.proto\"\xaa\x03\n\x13SimpleSupplyPayload\x123\n\x06action\
+    \n\rpayload.proto\"\xeb\x03\n\x13SimpleSupplyPayload\x123\n\x06action\
     \x18\x01\x20\x01(\x0e2\x1b.SimpleSupplyPayload.ActionR\x06action\x125\n\
     \x0ccreate_agent\x18\x02\x20\x01(\x0b2\x12.CreateAgentActionR\x0bcreateA\
     gent\x128\n\rcreate_record\x18\x03\x20\x01(\x0b2\x13.CreateRecordActionR\
     \x0ccreateRecord\x128\n\rupdate_record\x18\x04\x20\x01(\x0b2\x13.UpdateR\
-    ecordActionR\x0cupdateRecord\x12>\n\x0ftransfer_record\x18\x05\x20\x01(\
-    \x0b2\x15.TransferRecordActionR\x0etransferRecord\x12\x1c\n\ttimestamp\
-    \x18\x06\x20\x01(\tR\ttimestamp\"U\n\x06Action\x12\x10\n\x0cCREATE_AGENT\
-    \x10\0\x12\x11\n\rCREATE_RECORD\x10\x01\x12\x11\n\rUPDATE_RECORD\x10\x02\
-    \x12\x13\n\x0fTRANSFER_RECORD\x10\x03\"'\n\x11CreateAgentAction\x12\x12\
-    \n\x04name\x18\x01\x20\x01(\tR\x04name\"\x81\x01\n\x12CreateRecordAction\
-    \x12\x1b\n\trecord_id\x18\x01\x20\x01(\tR\x08recordId\x12\x14\n\x05title\
-    \x18\x02\x20\x01(\tR\x05title\x12\x1a\n\x08latitude\x18\x03\x20\x01(\x12\
-    R\x08latitude\x12\x1c\n\tlongitude\x18\x04\x20\x01(\x12R\tlongitude\"k\n\
-    \x12UpdateRecordAction\x12\x1b\n\trecord_id\x18\x01\x20\x01(\tR\x08recor\
-    dId\x12\x1a\n\x08latitude\x18\x02\x20\x01(\x12R\x08latitude\x12\x1c\n\tl\
-    ongitude\x18\x03\x20\x01(\x12R\tlongitude\"\\\n\x14TransferRecordAction\
+    ecordActionR\x0cupdateRecord\x12/\n\ncreate_bid\x18\x05\x20\x01(\x0b2\
+    \x10.CreateBidActionR\tcreateBid\x12>\n\x0ftransfer_record\x18\x06\x20\
+    \x01(\x0b2\x15.TransferRecordActionR\x0etransferRecord\x12\x1c\n\ttimest\
+    amp\x18\x07\x20\x01(\tR\ttimestamp\"e\n\x06Action\x12\x10\n\x0cCREATE_AG\
+    ENT\x10\0\x12\x11\n\rCREATE_RECORD\x10\x01\x12\x11\n\rUPDATE_RECORD\x10\
+    \x02\x12\x0e\n\nCREATE_BID\x10\x03\x12\x13\n\x0fTRANSFER_RECORD\x10\x04\
+    \"'\n\x11CreateAgentAction\x12\x12\n\x04name\x18\x01\x20\x01(\tR\x04name\
+    \"\x97\x01\n\x12CreateRecordAction\x12\x1b\n\trecord_id\x18\x01\x20\x01(\
+    \tR\x08recordId\x12\x14\n\x05title\x18\x02\x20\x01(\tR\x05title\x12\x14\
+    \n\x05price\x18\x03\x20\x01(\x04R\x05price\x12\x1a\n\x08latitude\x18\x04\
+    \x20\x01(\x12R\x08latitude\x12\x1c\n\tlongitude\x18\x05\x20\x01(\x12R\tl\
+    ongitude\"k\n\x12UpdateRecordAction\x12\x1b\n\trecord_id\x18\x01\x20\x01\
+    (\tR\x08recordId\x12\x1a\n\x08latitude\x18\x02\x20\x01(\x12R\x08latitude\
+    \x12\x1c\n\tlongitude\x18\x03\x20\x01(\x12R\tlongitude\"D\n\x0fCreateBid\
+    Action\x12\x1b\n\trecord_id\x18\x01\x20\x01(\tR\x08recordId\x12\x14\n\
+    \x05price\x18\x02\x20\x01(\x12R\x05price\"r\n\x14TransferRecordAction\
     \x12\x1b\n\trecord_id\x18\x01\x20\x01(\tR\x08recordId\x12'\n\x0freceivin\
-    g_agent\x18\x02\x20\x01(\tR\x0ereceivingAgentb\x06proto3\
+    g_agent\x18\x02\x20\x01(\tR\x0ereceivingAgent\x12\x14\n\x05price\x18\x03\
+    \x20\x01(\x12R\x05priceb\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {
