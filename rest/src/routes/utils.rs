@@ -3,6 +3,8 @@ use jwt::{
     Registered,
     Token,
 };
+use std::str;
+
 extern crate aes_soft as aes;
 extern crate block_modes;
 

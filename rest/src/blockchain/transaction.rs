@@ -11,7 +11,8 @@ use uuid::Uuid;
 use sawtooth_sdk::signing;
 use sawtooth_sdk::signing::{Context, PrivateKey, PublicKey};
 use sawtooth_sdk::messages::client_batch_submit::{ClientBatchSubmitRequest};
-use crate::blockchain::{serialize_payload, serialize_tp_payload};
+use crate::blockchain::{serialize_agent_payload, serialize_tp_payload};
+
 
 pub struct BCTransaction {
     pub family_name: String,
@@ -40,7 +41,11 @@ impl BCTransaction {
     }
 
     pub fn store(
-        &self, signer: signing::Signer, public_key: String, username: &str, sender: SawtoothConnection,
+        &self,
+        signer: signing::Signer,
+        public_key: String,
+        username: &str,
+        sender: SawtoothConnection,
     ) {
         // Calculate agent address
         let hashed_family = utils::hashed_value(&self.family_name);
@@ -49,7 +54,7 @@ impl BCTransaction {
 
         // Agent address
         let agent_address = &format!("{}{}{}", _namespace, self.agent_prefix, &hashed_pk[0..62]);
-        let agent_payload = serialize_payload(username.to_string());
+        let agent_payload = serialize_agent_payload(username.to_string());
         let batch = serialize_tp_payload(
             agent_payload,
             &*public_key,

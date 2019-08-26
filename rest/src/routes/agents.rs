@@ -1,5 +1,5 @@
-use crate::routes::{CreateAgentRequest, AuthorizeAgentRequest};
 use crate::{AppState};
+use crate::routes::{CreateAgentRequest, AuthorizeAgentRequest};
 use crate::database::{create_auth, fetch_auth_resource};
 use crate::blockchain::transaction::{BCTransaction};
 

@@ -3,14 +3,14 @@ pub mod transaction;
 
 use std::str;
 use protobuf::RepeatedField;
-use crate::payload::{CreateAgentAction, SimpleSupplyPayload, SimpleSupplyPayload_Action};
+use crate::payload::{CreateAgentAction, CreateRecordAction, SimpleSupplyPayload, SimpleSupplyPayload_Action};
 
 use sawtooth_sdk::signing;
 use sawtooth_sdk::messages::transaction::{TransactionHeader, Transaction};
 use sawtooth_sdk::messages::batch::{BatchHeader, Batch};
 
 
-fn serialize_payload(username: String) -> SimpleSupplyPayload {
+fn serialize_agent_payload(username: String) -> SimpleSupplyPayload {
     let mut create_agent = CreateAgentAction::new();
     create_agent.set_name(username.to_string());
 
@@ -35,7 +35,34 @@ fn serialize_payload(username: String) -> SimpleSupplyPayload {
     agent_payload
 }
 
-fn serialize_tp_payload(
+pub fn serialize_product_payload(
+    record_id: String,
+    title: String,
+) -> SimpleSupplyPayload {
+    let timestamp = time::get_time();
+    let mills = timestamp.sec as u64 + timestamp.nsec as u64 / 1000 / 1000;
+
+    let mut create_product = CreateRecordAction::new();
+    create_product.set_record_id(record_id);
+    create_product.set_title(title);
+
+    let product_msg = match protobuf::Message::write_to_bytes(&create_product) {
+        Ok(b) => b,
+        Err(error) => {
+            error!("Error serializing request: {:?}", error);
+            return SimpleSupplyPayload::new();
+        }
+    };
+
+    let mut product_payload = SimpleSupplyPayload::new();
+    product_payload.set_action(SimpleSupplyPayload_Action::CREATE_RECORD);
+    product_payload.set_create_record(create_product);
+    product_payload.set_timestamp(mills.to_string());
+
+    product_payload
+}
+
+pub fn serialize_tp_payload(
     agent_payload: SimpleSupplyPayload,
     public_key: &str,
     constants: &transaction::BCTransaction,
