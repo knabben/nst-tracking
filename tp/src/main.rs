@@ -2,18 +2,16 @@ extern crate protobuf;
 extern crate rustc_serialize;
 extern crate sawtooth_sdk;
 
-
-mod handler;
 mod addressing;
+mod handler;
 mod messages;
 
-use sawtooth_sdk::processor::TransactionProcessor;
 use handler::TradeTransactionHandler;
-
+use sawtooth_sdk::processor::TransactionProcessor;
 
 fn main() {
     println!("Starting sawtooth validator");
-    
+
     let endpoint = &"tcp://localhost:4004".to_string();
     let mut processor = TransactionProcessor::new(endpoint);
 

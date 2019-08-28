@@ -3,6 +3,7 @@ use crypto::sha2::Sha512;
 
 const FAMILY_NAME: &str = "trade";
 const AGENT: &str = "00";
+const RECORD: &str = "ec";
 
 pub fn hash(to_hash: &str, num: usize) -> String {
     let mut sha = Sha512::new();
@@ -23,4 +24,8 @@ pub fn get_supply_chain_prefix() -> String {
 
 pub fn make_agent_address(identifier: &str) -> String {
     get_supply_chain_prefix() + &AGENT + &hash(identifier, 62)
+}
+
+pub fn make_record_address(record_id: &str) -> String {
+    get_supply_chain_prefix() + &RECORD + &hash(record_id, 62)
 }

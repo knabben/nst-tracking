@@ -30,6 +30,8 @@ const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_2_8_0;
 pub struct Record {
     // message fields
     pub record_id: ::std::string::String,
+    pub title: ::std::string::String,
+    pub price: u64,
     pub owners: ::protobuf::RepeatedField<Record_Owner>,
     pub locations: ::protobuf::RepeatedField<Record_Location>,
     // special fields
@@ -74,7 +76,48 @@ impl Record {
         ::std::mem::replace(&mut self.record_id, ::std::string::String::new())
     }
 
-    // repeated .Record.Owner owners = 2;
+    // string title = 2;
+
+
+    pub fn get_title(&self) -> &str {
+        &self.title
+    }
+    pub fn clear_title(&mut self) {
+        self.title.clear();
+    }
+
+    // Param is passed by value, moved
+    pub fn set_title(&mut self, v: ::std::string::String) {
+        self.title = v;
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_title(&mut self) -> &mut ::std::string::String {
+        &mut self.title
+    }
+
+    // Take field
+    pub fn take_title(&mut self) -> ::std::string::String {
+        ::std::mem::replace(&mut self.title, ::std::string::String::new())
+    }
+
+    // uint64 price = 3;
+
+
+    pub fn get_price(&self) -> u64 {
+        self.price
+    }
+    pub fn clear_price(&mut self) {
+        self.price = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_price(&mut self, v: u64) {
+        self.price = v;
+    }
+
+    // repeated .Record.Owner owners = 4;
 
 
     pub fn get_owners(&self) -> &[Record_Owner] {
@@ -99,7 +142,7 @@ impl Record {
         ::std::mem::replace(&mut self.owners, ::protobuf::RepeatedField::new())
     }
 
-    // repeated .Record.Location locations = 3;
+    // repeated .Record.Location locations = 5;
 
 
     pub fn get_locations(&self) -> &[Record_Location] {
@@ -148,9 +191,19 @@ impl ::protobuf::Message for Record {
                     ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.record_id)?;
                 },
                 2 => {
-                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.owners)?;
+                    ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.title)?;
                 },
                 3 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint64()?;
+                    self.price = tmp;
+                },
+                4 => {
+                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.owners)?;
+                },
+                5 => {
                     ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.locations)?;
                 },
                 _ => {
@@ -167,6 +220,12 @@ impl ::protobuf::Message for Record {
         let mut my_size = 0;
         if !self.record_id.is_empty() {
             my_size += ::protobuf::rt::string_size(1, &self.record_id);
+        }
+        if !self.title.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.title);
+        }
+        if self.price != 0 {
+            my_size += ::protobuf::rt::value_size(3, self.price, ::protobuf::wire_format::WireTypeVarint);
         }
         for value in &self.owners {
             let len = value.compute_size();
@@ -185,13 +244,19 @@ impl ::protobuf::Message for Record {
         if !self.record_id.is_empty() {
             os.write_string(1, &self.record_id)?;
         }
+        if !self.title.is_empty() {
+            os.write_string(2, &self.title)?;
+        }
+        if self.price != 0 {
+            os.write_uint64(3, self.price)?;
+        }
         for v in &self.owners {
-            os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_tag(4, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
         };
         for v in &self.locations {
-            os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_tag(5, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
         };
@@ -242,6 +307,16 @@ impl ::protobuf::Message for Record {
                     |m: &Record| { &m.record_id },
                     |m: &mut Record| { &mut m.record_id },
                 ));
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
+                    "title",
+                    |m: &Record| { &m.title },
+                    |m: &mut Record| { &mut m.title },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint64>(
+                    "price",
+                    |m: &Record| { &m.price },
+                    |m: &mut Record| { &mut m.price },
+                ));
                 fields.push(::protobuf::reflect::accessor::make_repeated_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<Record_Owner>>(
                     "owners",
                     |m: &Record| { &m.owners },
@@ -275,6 +350,8 @@ impl ::protobuf::Message for Record {
 impl ::protobuf::Clear for Record {
     fn clear(&mut self) {
         self.record_id.clear();
+        self.title.clear();
+        self.price = 0;
         self.owners.clear();
         self.locations.clear();
         self.unknown_fields.clear();
@@ -906,15 +983,17 @@ impl ::protobuf::reflect::ProtobufValue for RecordContainer {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0crecord.proto\"\xa2\x02\n\x06Record\x12\x1b\n\trecord_id\x18\x01\
-    \x20\x01(\tR\x08recordId\x12%\n\x06owners\x18\x02\x20\x03(\x0b2\r.Record\
-    .OwnerR\x06owners\x12.\n\tlocations\x18\x03\x20\x03(\x0b2\x10.Record.Loc\
-    ationR\tlocations\x1a@\n\x05Owner\x12\x19\n\x08agent_id\x18\x01\x20\x01(\
-    \tR\x07agentId\x12\x1c\n\ttimestamp\x18\x02\x20\x01(\x04R\ttimestamp\x1a\
-    b\n\x08Location\x12\x1a\n\x08latitude\x18\x01\x20\x01(\x12R\x08latitude\
-    \x12\x1c\n\tlongitude\x18\x02\x20\x01(\x12R\tlongitude\x12\x1c\n\ttimest\
-    amp\x18\x03\x20\x01(\x04R\ttimestamp\"4\n\x0fRecordContainer\x12!\n\x07e\
-    ntries\x18\x01\x20\x03(\x0b2\x07.RecordR\x07entriesb\x06proto3\
+    \n\x0crecord.proto\"\xce\x02\n\x06Record\x12\x1b\n\trecord_id\x18\x01\
+    \x20\x01(\tR\x08recordId\x12\x14\n\x05title\x18\x02\x20\x01(\tR\x05title\
+    \x12\x14\n\x05price\x18\x03\x20\x01(\x04R\x05price\x12%\n\x06owners\x18\
+    \x04\x20\x03(\x0b2\r.Record.OwnerR\x06owners\x12.\n\tlocations\x18\x05\
+    \x20\x03(\x0b2\x10.Record.LocationR\tlocations\x1a@\n\x05Owner\x12\x19\n\
+    \x08agent_id\x18\x01\x20\x01(\tR\x07agentId\x12\x1c\n\ttimestamp\x18\x02\
+    \x20\x01(\x04R\ttimestamp\x1ab\n\x08Location\x12\x1a\n\x08latitude\x18\
+    \x01\x20\x01(\x12R\x08latitude\x12\x1c\n\tlongitude\x18\x02\x20\x01(\x12\
+    R\tlongitude\x12\x1c\n\ttimestamp\x18\x03\x20\x01(\x04R\ttimestamp\"4\n\
+    \x0fRecordContainer\x12!\n\x07entries\x18\x01\x20\x03(\x0b2\x07.RecordR\
+    \x07entriesb\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {
