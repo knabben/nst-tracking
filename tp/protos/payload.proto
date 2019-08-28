@@ -21,7 +21,6 @@ message SimpleSupplyPayload{
         CREATE_AGENT = 0;
         CREATE_RECORD = 1;
         UPDATE_RECORD = 2;
-        CREATE_BID = 3;
         TRANSFER_RECORD = 4;
     }
 
