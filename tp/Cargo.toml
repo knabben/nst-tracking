@@ -13,6 +13,7 @@ clap = "2"
 protobuf = "2"
 log = "0.3.0"
 log4rs = "0.7.0"
+env_logger = "0.6.2"
 
 [build-dependencies]
 protoc-rust = "2"

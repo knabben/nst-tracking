@@ -1,3 +1,7 @@
+#[macro_use]
+extern crate log;
+extern crate env_logger;
+
 extern crate protobuf;
 extern crate rustc_serialize;
 extern crate sawtooth_sdk;
@@ -11,6 +15,7 @@ use sawtooth_sdk::processor::TransactionProcessor;
 
 fn main() {
     println!("Starting sawtooth validator");
+    env_logger::init();
 
     let endpoint = &"tcp://localhost:4004".to_string();
     let mut processor = TransactionProcessor::new(endpoint);

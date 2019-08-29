@@ -375,7 +375,7 @@ impl TransactionHandler for TradeTransactionHandler {
 
         match payload.get_action() {
             Action::CreateAgent(agent_payload) => {
-                self._create_agent(agent_payload, state, signer, payload.get_timestamp());
+                self._create_agent(agent_payload, state, signer, payload.get_timestamp())?
             },
             Action::CreateRecord(record_payload) => {
                 self._create_record(record_payload, state, signer, payload.get_timestamp());
