@@ -1,5 +1,4 @@
-
-use crate::database::schema::{auth};
+use crate::database::schema::auth;
 
 #[derive(Queryable)]
 pub struct Auth {

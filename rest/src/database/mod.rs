@@ -10,26 +10,24 @@ use std::ops::Deref;
 extern crate aes_soft as aes;
 extern crate block_modes;
 
+use aes::Aes128;
+use block_modes::block_padding::Pkcs7;
+use block_modes::{BlockMode, Cbc};
 use crypto::digest::Digest;
 use crypto::sha2::Sha512;
-use aes::Aes128;
-use block_modes::{BlockMode, Cbc};
-use block_modes::block_padding::Pkcs7;
 
 use crate::diesel::RunQueryDsl;
 type Aes128Cbc = Cbc<Aes128, Pkcs7>;
 
-use crate::database::models::{Auth};
+use crate::database::models::Auth;
 use sawtooth_sdk::signing::{PrivateKey, PublicKey};
 
-use diesel_migrations::{
-  run_pending_migrations,
-};
 use diesel::{
     connection::Connection as _,
     pg::PgConnection,
     r2d2::{ConnectionManager, Pool, PooledConnection},
 };
+use diesel_migrations::run_pending_migrations;
 
 pub struct Connection(PooledConnection<ConnectionManager<PgConnection>>);
 
@@ -53,17 +51,19 @@ impl ConnectionPool {
 }
 
 pub fn run_all_migrations(database_url: &str) -> Result<(), Box<Error>> {
-  let connection = PgConnection::establish(database_url)?;
-  run_pending_migrations(&connection)?;
-  Ok(())
+    let connection = PgConnection::establish(database_url)?;
+    run_pending_migrations(&connection)?;
+    Ok(())
 }
 
 pub fn create_connection_pool(database_url: &str) -> Result<ConnectionPool, r2d2::Error> {
-  let connection_manager = ConnectionManager::<PgConnection>::new(database_url);
+    let connection_manager = ConnectionManager::<PgConnection>::new(database_url);
 
-  Ok(ConnectionPool {
-    pool: Pool::builder().build(connection_manager).map_err(|err| err)?,
-  })
+    Ok(ConnectionPool {
+        pool: Pool::builder()
+            .build(connection_manager)
+            .map_err(|err| err)?,
+    })
 }
 
 pub fn create_auth(
@@ -71,7 +71,7 @@ pub fn create_auth(
     private_key: &dyn PrivateKey,
     username: String,
     password: String,
-    conn: &PgConnection
+    conn: &PgConnection,
 ) -> Auth {
     // Encrypt private key
     let key = hex!("ffffffffffffffffffffffffffffffff");
@@ -96,19 +96,19 @@ pub fn create_auth(
     };
 
     diesel::insert_into(auth::table)
-      .values(&auth_data)
-      .get_result(conn)
-      .expect("Error saving new post")
+        .values(&auth_data)
+        .get_result(conn)
+        .expect("Error saving new post")
 }
 
 pub fn fetch_auth_resource(un: String, conn: &PgConnection) -> self::models::Auth {
-  use self::schema::auth::dsl::*;
-  use diesel::prelude::*;
+    use self::schema::auth::dsl::*;
+    use diesel::prelude::*;
 
-  let results = auth
-    .filter(username.eq(un))
-    .first::<Auth>(conn)
-    .expect("Error loading users.");
+    let results = auth
+        .filter(username.eq(un))
+        .first::<Auth>(conn)
+        .expect("Error loading users.");
 
-  results
+    results
 }

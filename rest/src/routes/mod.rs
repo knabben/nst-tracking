@@ -10,10 +10,10 @@ pub struct CreateAgentRequest {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateProductRequest {
-  pub record_id: String,
-  pub title: String,
-  pub latitude: u32,
-  pub longitude: u32,
+    pub record_id: String,
+    pub title: String,
+    pub latitude: u32,
+    pub longitude: u32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

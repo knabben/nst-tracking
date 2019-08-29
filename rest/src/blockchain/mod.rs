@@ -1,14 +1,15 @@
-pub mod utils;
 pub mod transaction;
+pub mod utils;
 
-use std::str;
+use crate::payload::{
+    CreateAgentAction, CreateRecordAction, SimpleSupplyPayload, SimpleSupplyPayload_Action,
+};
 use protobuf::RepeatedField;
-use crate::payload::{CreateAgentAction, CreateRecordAction, SimpleSupplyPayload, SimpleSupplyPayload_Action};
+use std::str;
 
+use sawtooth_sdk::messages::batch::{Batch, BatchHeader};
+use sawtooth_sdk::messages::transaction::{Transaction, TransactionHeader};
 use sawtooth_sdk::signing;
-use sawtooth_sdk::messages::transaction::{TransactionHeader, Transaction};
-use sawtooth_sdk::messages::batch::{BatchHeader, Batch};
-
 
 fn serialize_agent_payload(username: String) -> SimpleSupplyPayload {
     let mut create_agent = CreateAgentAction::new();
@@ -23,9 +24,13 @@ fn serialize_agent_payload(username: String) -> SimpleSupplyPayload {
         Err(error) => {
             error!("Error serializing request: {:?}", error);
             return SimpleSupplyPayload::new();
-        },
+        }
     };
-    debug!("create_agent - {:?} {:?}", action_msg, str::from_utf8(&action_msg));
+    debug!(
+        "create_agent - {:?} {:?}",
+        action_msg,
+        str::from_utf8(&action_msg)
+    );
 
     let mut agent_payload = SimpleSupplyPayload::new();
     agent_payload.set_action(SimpleSupplyPayload_Action::CREATE_AGENT);
@@ -35,10 +40,7 @@ fn serialize_agent_payload(username: String) -> SimpleSupplyPayload {
     agent_payload
 }
 
-pub fn serialize_product_payload(
-    record_id: String,
-    title: String,
-) -> SimpleSupplyPayload {
+pub fn serialize_product_payload(record_id: String, title: String) -> SimpleSupplyPayload {
     let timestamp = time::get_time();
     let mills = timestamp.sec as u64 + timestamp.nsec as u64 / 1000 / 1000;
 
@@ -62,19 +64,19 @@ pub fn serialize_product_payload(
     product_payload
 }
 
-pub fn serialize_tp_payload(
-    agent_payload: SimpleSupplyPayload,
+pub fn serialize_transaction_payload(
+    payload: SimpleSupplyPayload,
     public_key: &str,
     constants: &transaction::BCTransaction,
     agent_address: String,
     signer: signing::Signer,
 ) -> Batch {
-    let agent_msg = match protobuf::Message::write_to_bytes(&agent_payload) {
+    let agent_msg = match protobuf::Message::write_to_bytes(&payload) {
         Ok(b) => b,
         Err(error) => {
             error!("Error serializing request: {:?}", error);
             return Batch::new();
-        },
+        }
     };
 
     let agent_string = match str::from_utf8(&agent_msg) {
@@ -106,7 +108,7 @@ pub fn serialize_tp_payload(
         Err(error) => {
             error!("Error serializing request: {:?}", error);
             return Batch::new();
-        },
+        }
     };
     debug!("transaction_header: {:?}", transaction_msg);
 
@@ -118,7 +120,7 @@ pub fn serialize_tp_payload(
         Err(error) => {
             error!("Error serializing request: {:?}", error);
             return Batch::new();
-        },
+        }
     };
     let signature = signer.sign(&transaction_header_msg).unwrap();
     transaction.set_header(transaction_header_msg);
@@ -129,9 +131,9 @@ pub fn serialize_tp_payload(
     // Batch header
     let mut batch_header = BatchHeader::new();
     batch_header.set_signer_public_key(public_key.to_string());
-    batch_header.set_transaction_ids(RepeatedField::from_vec(
-        vec![transaction.get_header_signature().to_string()])
-    );
+    batch_header.set_transaction_ids(RepeatedField::from_vec(vec![transaction
+        .get_header_signature()
+        .to_string()]));
 
     // Batch protobuf
     let mut batch = Batch::new();
@@ -140,7 +142,7 @@ pub fn serialize_tp_payload(
         Err(error) => {
             error!("Error serializing request: {:?}", error);
             return Batch::new();
-        },
+        }
     };
     let sign_batch = signer.sign(&batch_header_msg).unwrap();
 

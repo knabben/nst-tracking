@@ -1,21 +1,15 @@
-use jwt::{
-    Header,
-    Registered,
-    Token,
-};
+use jwt::{Header, Registered, Token};
 use std::str;
 
 extern crate aes_soft as aes;
 extern crate block_modes;
 
-use diesel::{pg::PgConnection};
-use crypto::sha2::Sha256;
-use crate::routes::{Response};
-use crate::database::{fetch_auth_resource};
+use crate::database::fetch_auth_resource;
+use crate::routes::Response;
 use block_modes::block_padding::Pkcs7;
 use block_modes::{BlockMode, Cbc};
-
-
+use crypto::sha2::Sha256;
+use diesel::pg::PgConnection;
 
 use aes::Aes128;
 type Aes128Cbc = Cbc<Aes128, Pkcs7>;
@@ -27,7 +21,9 @@ pub fn generate_jwt(username: String, jwt_token: &[u8]) -> Response {
         ..Default::default()
     };
     let token = Token::new(header, claims);
-    Response{ token: token.signed(&jwt_token, Sha256::new()).unwrap() }
+    Response {
+        token: token.signed(&jwt_token, Sha256::new()).unwrap(),
+    }
 }
 
 pub fn deserialize_jwt(secret: &[u8], jwt_token: &str) -> (bool, String) {
