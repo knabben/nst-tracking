@@ -69,6 +69,7 @@ const ProductForm = () => {
             {errors.record_id && touched.record_id && errors.record_id}
             <Input
               fullWidth
+              type="number"
               placeholder="Initial price ($)"
               className={classes.input}
               onChange={handleChange}
