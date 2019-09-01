@@ -124,7 +124,13 @@ impl BCTransaction {
         product: &CreateProductRequest,
     ) -> Batch {
         let agent_address = self.calculate_agent_address(&public_key);
-        let payload = serialize_product_payload(product.record_id.clone(), product.title.clone());
+        let payload = serialize_product_payload(
+            product.record_id.clone(), 
+            product.title.clone(),
+            product.price,
+            product.latitude,
+            product.longitude,
+        );
         serialize_transaction_payload(
             payload,
             &public_key,

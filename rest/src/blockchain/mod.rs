@@ -40,13 +40,22 @@ fn serialize_agent_payload(username: String) -> SimpleSupplyPayload {
     agent_payload
 }
 
-pub fn serialize_product_payload(record_id: String, title: String) -> SimpleSupplyPayload {
+pub fn serialize_product_payload(
+    record_id: String,
+    title: String, 
+    price: i64,
+    latitude: i64,
+    longitude: i64,
+) -> SimpleSupplyPayload {
     let timestamp = time::get_time();
     let mills = timestamp.sec as u64 + timestamp.nsec as u64 / 1000 / 1000;
 
     let mut create_product = CreateRecordAction::new();
     create_product.set_record_id(record_id);
     create_product.set_title(title);
+    create_product.set_price(price);
+    create_product.set_latitude(latitude);
+    create_product.set_longitude(longitude);
 
     let product_msg = match protobuf::Message::write_to_bytes(&create_product) {
         Ok(b) => b,

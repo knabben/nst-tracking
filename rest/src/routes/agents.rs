@@ -30,6 +30,7 @@ pub fn create_agent(
     // Serialize agent payload and send to TP
     let batch =
         transaction.store_agent(signer, _public_key.as_hex().to_string(), &username.clone());
+
     transaction.send_zeromq(data.sawtooth_connection.clone(), batch);
 
     // Save on database

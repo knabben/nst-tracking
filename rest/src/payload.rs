@@ -749,7 +749,7 @@ pub struct CreateRecordAction {
     // message fields
     pub record_id: ::std::string::String,
     pub title: ::std::string::String,
-    pub price: u64,
+    pub price: i64,
     pub latitude: i64,
     pub longitude: i64,
     // special fields
@@ -820,10 +820,10 @@ impl CreateRecordAction {
         ::std::mem::replace(&mut self.title, ::std::string::String::new())
     }
 
-    // uint64 price = 3;
+    // sint64 price = 3;
 
 
-    pub fn get_price(&self) -> u64 {
+    pub fn get_price(&self) -> i64 {
         self.price
     }
     pub fn clear_price(&mut self) {
@@ -831,7 +831,7 @@ impl CreateRecordAction {
     }
 
     // Param is passed by value, moved
-    pub fn set_price(&mut self, v: u64) {
+    pub fn set_price(&mut self, v: i64) {
         self.price = v;
     }
 
@@ -885,7 +885,7 @@ impl ::protobuf::Message for CreateRecordAction {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
-                    let tmp = is.read_uint64()?;
+                    let tmp = is.read_sint64()?;
                     self.price = tmp;
                 },
                 4 => {
@@ -921,7 +921,7 @@ impl ::protobuf::Message for CreateRecordAction {
             my_size += ::protobuf::rt::string_size(2, &self.title);
         }
         if self.price != 0 {
-            my_size += ::protobuf::rt::value_size(3, self.price, ::protobuf::wire_format::WireTypeVarint);
+            my_size += ::protobuf::rt::value_varint_zigzag_size(3, self.price);
         }
         if self.latitude != 0 {
             my_size += ::protobuf::rt::value_varint_zigzag_size(4, self.latitude);
@@ -942,7 +942,7 @@ impl ::protobuf::Message for CreateRecordAction {
             os.write_string(2, &self.title)?;
         }
         if self.price != 0 {
-            os.write_uint64(3, self.price)?;
+            os.write_sint64(3, self.price)?;
         }
         if self.latitude != 0 {
             os.write_sint64(4, self.latitude)?;
@@ -1002,7 +1002,7 @@ impl ::protobuf::Message for CreateRecordAction {
                     |m: &CreateRecordAction| { &m.title },
                     |m: &mut CreateRecordAction| { &mut m.title },
                 ));
-                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint64>(
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeSint64>(
                     "price",
                     |m: &CreateRecordAction| { &m.price },
                     |m: &mut CreateRecordAction| { &mut m.price },
@@ -1764,7 +1764,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \"'\n\x11CreateAgentAction\x12\x12\n\x04name\x18\x01\x20\x01(\tR\x04name\
     \"\x97\x01\n\x12CreateRecordAction\x12\x1b\n\trecord_id\x18\x01\x20\x01(\
     \tR\x08recordId\x12\x14\n\x05title\x18\x02\x20\x01(\tR\x05title\x12\x14\
-    \n\x05price\x18\x03\x20\x01(\x04R\x05price\x12\x1a\n\x08latitude\x18\x04\
+    \n\x05price\x18\x03\x20\x01(\x12R\x05price\x12\x1a\n\x08latitude\x18\x04\
     \x20\x01(\x12R\x08latitude\x12\x1c\n\tlongitude\x18\x05\x20\x01(\x12R\tl\
     ongitude\"k\n\x12UpdateRecordAction\x12\x1b\n\trecord_id\x18\x01\x20\x01\
     (\tR\x08recordId\x12\x1a\n\x08latitude\x18\x02\x20\x01(\x12R\x08latitude\
