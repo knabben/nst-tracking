@@ -56,7 +56,7 @@ message CreateRecordAction {
     string title = 2;
 
     // initial price of the record
-    uint64 price = 3;
+    sint64 price = 3;
 
     // Coordinates are expected to be in millionths of a degree
     sint64 latitude = 4;

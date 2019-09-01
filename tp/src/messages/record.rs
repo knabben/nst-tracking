@@ -31,7 +31,7 @@ pub struct Record {
     // message fields
     pub record_id: ::std::string::String,
     pub title: ::std::string::String,
-    pub price: u64,
+    pub price: i64,
     pub owners: ::protobuf::RepeatedField<Record_Owner>,
     pub locations: ::protobuf::RepeatedField<Record_Location>,
     // special fields
@@ -102,10 +102,10 @@ impl Record {
         ::std::mem::replace(&mut self.title, ::std::string::String::new())
     }
 
-    // uint64 price = 3;
+    // sint64 price = 3;
 
 
-    pub fn get_price(&self) -> u64 {
+    pub fn get_price(&self) -> i64 {
         self.price
     }
     pub fn clear_price(&mut self) {
@@ -113,7 +113,7 @@ impl Record {
     }
 
     // Param is passed by value, moved
-    pub fn set_price(&mut self, v: u64) {
+    pub fn set_price(&mut self, v: i64) {
         self.price = v;
     }
 
@@ -197,7 +197,7 @@ impl ::protobuf::Message for Record {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
-                    let tmp = is.read_uint64()?;
+                    let tmp = is.read_sint64()?;
                     self.price = tmp;
                 },
                 4 => {
@@ -225,7 +225,7 @@ impl ::protobuf::Message for Record {
             my_size += ::protobuf::rt::string_size(2, &self.title);
         }
         if self.price != 0 {
-            my_size += ::protobuf::rt::value_size(3, self.price, ::protobuf::wire_format::WireTypeVarint);
+            my_size += ::protobuf::rt::value_varint_zigzag_size(3, self.price);
         }
         for value in &self.owners {
             let len = value.compute_size();
@@ -248,7 +248,7 @@ impl ::protobuf::Message for Record {
             os.write_string(2, &self.title)?;
         }
         if self.price != 0 {
-            os.write_uint64(3, self.price)?;
+            os.write_sint64(3, self.price)?;
         }
         for v in &self.owners {
             os.write_tag(4, ::protobuf::wire_format::WireTypeLengthDelimited)?;
@@ -312,7 +312,7 @@ impl ::protobuf::Message for Record {
                     |m: &Record| { &m.title },
                     |m: &mut Record| { &mut m.title },
                 ));
-                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint64>(
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeSint64>(
                     "price",
                     |m: &Record| { &m.price },
                     |m: &mut Record| { &mut m.price },
@@ -985,7 +985,7 @@ impl ::protobuf::reflect::ProtobufValue for RecordContainer {
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0crecord.proto\"\xce\x02\n\x06Record\x12\x1b\n\trecord_id\x18\x01\
     \x20\x01(\tR\x08recordId\x12\x14\n\x05title\x18\x02\x20\x01(\tR\x05title\
-    \x12\x14\n\x05price\x18\x03\x20\x01(\x04R\x05price\x12%\n\x06owners\x18\
+    \x12\x14\n\x05price\x18\x03\x20\x01(\x12R\x05price\x12%\n\x06owners\x18\
     \x04\x20\x03(\x0b2\r.Record.OwnerR\x06owners\x12.\n\tlocations\x18\x05\
     \x20\x03(\x0b2\x10.Record.LocationR\tlocations\x1a@\n\x05Owner\x12\x19\n\
     \x08agent_id\x18\x01\x20\x01(\tR\x07agentId\x12\x1c\n\ttimestamp\x18\x02\

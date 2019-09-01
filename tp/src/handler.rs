@@ -316,12 +316,20 @@ impl TradeTransactionHandler {
             Err(err) => return Err(err),
         }
 
+        let mut coords = record::Record_Location::new();
+        coords.set_latitude(payload.get_latitude());
+        coords.set_longitude(payload.get_longitude());
+
         let mut owner = record::Record_Owner::new();
         owner.set_agent_id(signer.to_string());
         owner.set_timestamp(0);
 
         let mut record = record::Record::new();
+        record.set_title(payload.get_title().to_string());
+        record.set_price(payload.get_price());
+
         record.owners.push(owner.clone());
+        record.locations.push(coords.clone());
 
         state.set_product(record_id, record)?;
         
