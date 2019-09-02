@@ -19,7 +19,7 @@ use crypto::sha2::Sha512;
 use crate::diesel::RunQueryDsl;
 type Aes128Cbc = Cbc<Aes128, Pkcs7>;
 
-use crate::database::models::Auth;
+use crate::database::models::{Auth, Product};
 use sawtooth_sdk::signing::{PrivateKey, PublicKey};
 
 use diesel::{
@@ -111,4 +111,17 @@ pub fn fetch_auth_resource(un: String, conn: &PgConnection) -> self::models::Aut
         .expect("Error loading users.");
 
     results
+}
+
+
+pub fn fetch_products(id: i64, conn: &PgConnection) {
+    use self::schema::product::dsl::*;
+    use diesel::prelude::*;
+
+    let results = product
+        .filter(auth_id.eq(id))
+        .load::<Product>(conn)
+        .expect("Error loading products.");
+
+    println!("{:?}", results);
 }
