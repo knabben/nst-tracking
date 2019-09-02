@@ -1,0 +1,5 @@
+CREATE TABLE bid (
+  id BIGSERIAL PRIMARY KEY,
+  product_id BIGINT NOT NULL,
+  price BIGINT NOT NULL
+);
