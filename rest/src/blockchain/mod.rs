@@ -75,7 +75,8 @@ pub fn serialize_product_payload(
 
 pub fn serialize_bid_payload(
     product_id: i64,
-    price: i64
+    price: i64,
+    agent_id: i64
 ) -> SimpleSupplyPayload {
     let timestamp = time::get_time();
     let mills = timestamp.sec as u64 + timestamp.nsec as u64 / 1000 / 1000;
@@ -83,6 +84,7 @@ pub fn serialize_bid_payload(
     let mut bid_product = CreateBidAction::new();
     bid_product.set_product_id(product_id);
     bid_product.set_price(price);
+    bid_product.set_agent_id(agent_id);
 
     let _product_msg = match protobuf::Message::write_to_bytes(&bid_product) {
         Ok(b) => b,

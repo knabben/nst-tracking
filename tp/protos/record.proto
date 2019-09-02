@@ -38,7 +38,7 @@ message Record {
     // real world (for example a serial number)
     string record_id = 1;
     string title = 2;
-    sint64 price = 3;
+    uint64 price = 3;
 
     // Ordered oldest to newest by timestamp
     repeated Owner owners = 4;

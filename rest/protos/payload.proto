@@ -78,7 +78,11 @@ message CreateBidAction {
     // The id of the product being updated
     sint64 product_id = 1;
 
+    // a price for this bid
     sint64 price = 2;
+    
+    // the agent sending the bid
+    sint64 agent_id = 3;
 }
 
 message TransferRecordAction {

@@ -21,6 +21,7 @@ message SimpleSupplyPayload{
         CREATE_AGENT = 0;
         CREATE_RECORD = 1;
         UPDATE_RECORD = 2;
+        CREATE_BID = 3;
         TRANSFER_RECORD = 4;
     }
 
@@ -74,10 +75,14 @@ message UpdateRecordAction {
 }
 
 message CreateBidAction {
-    // The id of the record being updated
-    string record_id = 1;
+    // The id of the product being updated
+    sint64 product_id = 1;
 
+    // a price for this bid
     sint64 price = 2;
+    
+    // the agent sending the bid
+    sint64 agent_id = 3;
 }
 
 message TransferRecordAction {

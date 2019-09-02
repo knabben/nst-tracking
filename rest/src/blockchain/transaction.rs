@@ -143,11 +143,13 @@ impl BCTransaction {
         signer: signing::Signer,
         public_key: String,
         bid: &CreateBidRequest,
+        agent_id: i64,
     ) -> Batch {
         let agent_address = self.calculate_agent_address(&public_key);
         let payload = serialize_bid_payload(
             bid.product_id, 
             bid.price,
+            agent_id,
         );
         serialize_transaction_payload(
             payload,
