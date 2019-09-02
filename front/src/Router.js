@@ -20,7 +20,7 @@ const Root = ({ store }) => (
   <Provider store={store}>
     <ConnectedRouter history={history}>
       <Menu />
-      <Route path="/" exact component={Home} />
+      <Route path="/home" exact component={Home} />
       <Route path="/signin" exact component={SigninForm} />
       <Route path="/signup" exact component={SignupForm} />
       <Route path="/product" exact component={ProductForm} />

@@ -60,7 +60,7 @@ const SignupForm = () => {
         <Container component="main" maxWidth="xs">
         <CssBaseline />
         <div className={classes.paper}>
-          <Typography component="h1" variant="h5"> SIGNUP </Typography>
+          <Typography component="h1" variant="h5"> Sign up </Typography>
           <form onSubmit={handleSubmit} noValidate autoComplete="off">
             <Input
               fullWidth

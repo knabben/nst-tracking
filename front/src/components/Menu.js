@@ -13,9 +13,7 @@ const Menu = () => {
   const authenticated = useSelector(isAuthenticated);
   const [value, setValue] = React.useState(1);
   
-  const onChange = (e, nv) => {
-    setValue(nv)
-  }
+  const onChange = (e, nv) => { setValue(nv) }
 
   return (
     <Container component="main" maxWidth="xs">
