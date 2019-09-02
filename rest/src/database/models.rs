@@ -1,5 +1,5 @@
 use crate::database::schema::auth;
-use crate::database::schema::product;
+use serde::{Serialize};
 
 #[derive(Debug, Queryable)]
 pub struct Auth {
@@ -10,7 +10,7 @@ pub struct Auth {
     pub encrypted_private_key: String,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Serialize, Queryable)]
 pub struct Product {
     pub id: i64,
     pub record_id: String,

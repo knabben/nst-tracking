@@ -61,8 +61,6 @@ pub fn list_products(
     let db = data.database_connection.get().unwrap();
     let private_key = decode_private_key(username.clone(), &db);
     let auth_info = fetch_auth_resource(username.clone(), &db);
-    
-    fetch_products(auth_info.id, &db);
 
-    HttpResponse::Ok().json("")
+    HttpResponse::Ok().json(fetch_products(auth_info.id, &db))
 }

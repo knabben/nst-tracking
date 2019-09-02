@@ -114,7 +114,7 @@ pub fn fetch_auth_resource(un: String, conn: &PgConnection) -> self::models::Aut
 }
 
 
-pub fn fetch_products(id: i64, conn: &PgConnection) {
+pub fn fetch_products(id: i64, conn: &PgConnection) -> Vec<Product> {
     use self::schema::product::dsl::*;
     use diesel::prelude::*;
 
@@ -123,5 +123,5 @@ pub fn fetch_products(id: i64, conn: &PgConnection) {
         .load::<Product>(conn)
         .expect("Error loading products.");
 
-    println!("{:?}", results);
+    results
 }
