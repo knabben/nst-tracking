@@ -18,7 +18,7 @@ pub fn create_agent(
     let username = agent.username.clone();
 
     // Create transactino
-    let transaction = BCTransaction::new("trade".to_string(), "1.0".to_string(), "00".to_string());
+    let transaction = BCTransaction::new("trade".to_string(), "1.0".to_string());
 
     // Generate key pairs
     let (_private_key, _public_key) = transaction.generate_key_pair(&*transaction.context);

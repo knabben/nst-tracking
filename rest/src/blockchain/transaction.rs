@@ -19,17 +19,21 @@ pub struct BCTransaction {
     pub family_name: String,
     pub family_version: String,
     pub agent_prefix: String,
+    pub product_prefix: String,
+    pub bid_prefix: String,
     pub context: Box<dyn Context>,
 }
 
 impl BCTransaction {
-    pub fn new(family_name: String, family_version: String, agent_prefix: String) -> BCTransaction {
+    pub fn new(family_name: String, family_version: String) -> BCTransaction {
         let context = signing::create_context("secp256k1").unwrap();
         BCTransaction {
             context: context,
             family_name: family_name,
             family_version: family_version,
-            agent_prefix: agent_prefix,
+            agent_prefix: "00".to_string(),
+            product_prefix: "ec".to_string(),
+            bid_prefix: "ed".to_string(),
         }
     }
 
@@ -48,14 +52,28 @@ impl BCTransaction {
         (private_key, public_key)
     }
 
-    // Calculate agent address
     pub fn calculate_agent_address(&self, public_key: &str) -> String {
         let hashed_family = utils::hashed_value(&self.family_name);
-        let _namespace = &hashed_family[0..6];
-        let hashed_pk = utils::hashed_value(&public_key);
-        let agent_address = &format!("{}{}{}", _namespace, self.agent_prefix, &hashed_pk[0..62]);
-
+        let namespace = &hashed_family[0..6];
+        let address = &utils::hashed_value(&public_key)[0..62];
+        let agent_address = &format!("{}{}{}", namespace, self.agent_prefix, &address);
         agent_address.to_string()
+    }
+
+    pub fn calculate_product_address(&self, public_key: &str) -> String {
+        let hashed_family = utils::hashed_value(&self.family_name);
+        let namespace = &hashed_family[0..6];
+        let address = &utils::hashed_value(&public_key)[0..62];
+        let product_address = &format!("{}{}{}", namespace, self.product_prefix, &address);
+        product_address.to_string()
+    }
+
+    pub fn calculate_bid_address(&self, public_key: &str) -> String {
+        let hashed_family = utils::hashed_value(&self.family_name);
+        let namespace = &hashed_family[0..6];
+        let address = &utils::hashed_value(&public_key)[0..62];
+        let bid_address = &format!("{}{}{}", namespace, self.bid_prefix, &address);
+        bid_address.to_string()
     }
 
     // Send transaction to ZeroMQ
@@ -106,11 +124,16 @@ impl BCTransaction {
     ) -> Batch {
         let agent_address = self.calculate_agent_address(&public_key);
         let payload = serialize_agent_payload(username.to_string());
+
+        let inputs = vec![agent_address.to_string()];
+        let outputs = vec![agent_address.to_string()];
+
         serialize_transaction_payload(
             payload,
             &public_key,
             self,
-            agent_address.to_string(),
+            inputs,
+            outputs,
             signer,
         )
     }
@@ -121,7 +144,9 @@ impl BCTransaction {
         public_key: String,
         product: &CreateProductRequest,
     ) -> Batch {
+        let product_address = self.calculate_product_address(&public_key);
         let agent_address = self.calculate_agent_address(&public_key);
+
         let payload = serialize_product_payload(
             product.record_id.clone(), 
             product.title.clone(),
@@ -129,11 +154,16 @@ impl BCTransaction {
             product.latitude,
             product.longitude,
         );
+
+        let inputs = vec![agent_address.to_string(), product_address.to_string()];
+        let outputs = vec![product_address.to_string()];
+
         serialize_transaction_payload(
             payload,
             &public_key,
             self,
-            agent_address.to_string(),
+            inputs,
+            outputs,
             signer,
         )
     }
@@ -145,17 +175,24 @@ impl BCTransaction {
         bid: &CreateBidRequest,
         agent_id: i64,
     ) -> Batch {
-        let agent_address = self.calculate_agent_address(&public_key);
+        let bid_address = self.calculate_bid_address(&public_key);
+        let agent_address = self.calculate_product_address(&public_key);
+
         let payload = serialize_bid_payload(
             bid.product_id, 
             bid.price,
             agent_id,
         );
+
+        let inputs = vec![agent_address.to_string(), bid_address.to_string()];     
+        let outputs = vec![bid_address.to_string()];
+
         serialize_transaction_payload(
             payload,
             &public_key,
             self,
-            agent_address.to_string(),
+            inputs,
+            outputs,
             signer,
         )
     }

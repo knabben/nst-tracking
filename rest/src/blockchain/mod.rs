@@ -1,5 +1,6 @@
 pub mod transaction;
 pub mod utils;
+use std::vec::Vec;
 
 use crate::payload::{
     CreateAgentAction, CreateBidAction, CreateRecordAction, SimpleSupplyPayload, SimpleSupplyPayload_Action,
@@ -106,7 +107,8 @@ pub fn serialize_transaction_payload(
     payload: SimpleSupplyPayload,
     public_key: &str,
     constants: &transaction::BCTransaction,
-    agent_address: String,
+    inputs: Vec<String>,
+    outputs: Vec<String>,
     signer: signing::Signer,
 ) -> Batch {
     let agent_msg = match protobuf::Message::write_to_bytes(&payload) {
@@ -126,8 +128,8 @@ pub fn serialize_transaction_payload(
     };
     debug!("agent - {:?}", agent_msg);
 
-    let inputs = vec![agent_address.to_string()];
-    let outputs = vec![agent_address.to_string()];
+    let inputs =  inputs; //vec![agent_address.to_string()];
+    let outputs = outputs; //vec![agent_address.to_string()];
 
     // Transaction header
     let mut transaction_header = TransactionHeader::new();

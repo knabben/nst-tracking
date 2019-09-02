@@ -27,7 +27,7 @@ pub fn create_bid_endpoint(
     let auth_info = fetch_auth_resource(username.clone(), &db);
 
     // Create transaction
-    let transaction = BCTransaction::new("trade".to_string(), "1.0".to_string(), "00".to_string());
+    let transaction = BCTransaction::new("trade".to_string(), "1.0".to_string());
     let crypto_factory = CryptoFactory::new(&*transaction.context);
 
     // PrivateKey setup
