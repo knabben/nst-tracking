@@ -75,9 +75,9 @@ message UpdateRecordAction {
 }
 
 message CreateBidAction {
-    // The id of the record being updated
-    string record_id = 1;
-
+    // The id of the product being updated
+    string product_id = 1;
+    
     sint64 price = 2;
 }
 
