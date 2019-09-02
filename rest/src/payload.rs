@@ -1302,7 +1302,7 @@ impl ::protobuf::reflect::ProtobufValue for UpdateRecordAction {
 #[derive(PartialEq,Clone,Default)]
 pub struct CreateBidAction {
     // message fields
-    pub product_id: ::std::string::String,
+    pub product_id: i64,
     pub price: i64,
     // special fields
     pub unknown_fields: ::protobuf::UnknownFields,
@@ -1320,30 +1320,19 @@ impl CreateBidAction {
         ::std::default::Default::default()
     }
 
-    // string product_id = 1;
+    // sint64 product_id = 1;
 
 
-    pub fn get_product_id(&self) -> &str {
-        &self.product_id
+    pub fn get_product_id(&self) -> i64 {
+        self.product_id
     }
     pub fn clear_product_id(&mut self) {
-        self.product_id.clear();
+        self.product_id = 0;
     }
 
     // Param is passed by value, moved
-    pub fn set_product_id(&mut self, v: ::std::string::String) {
+    pub fn set_product_id(&mut self, v: i64) {
         self.product_id = v;
-    }
-
-    // Mutable pointer to the field.
-    // If field is not initialized, it is initialized with default value first.
-    pub fn mut_product_id(&mut self) -> &mut ::std::string::String {
-        &mut self.product_id
-    }
-
-    // Take field
-    pub fn take_product_id(&mut self) -> ::std::string::String {
-        ::std::mem::replace(&mut self.product_id, ::std::string::String::new())
     }
 
     // sint64 price = 2;
@@ -1372,7 +1361,11 @@ impl ::protobuf::Message for CreateBidAction {
             let (field_number, wire_type) = is.read_tag_unpack()?;
             match field_number {
                 1 => {
-                    ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.product_id)?;
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_sint64()?;
+                    self.product_id = tmp;
                 },
                 2 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
@@ -1393,8 +1386,8 @@ impl ::protobuf::Message for CreateBidAction {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u32 {
         let mut my_size = 0;
-        if !self.product_id.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.product_id);
+        if self.product_id != 0 {
+            my_size += ::protobuf::rt::value_varint_zigzag_size(1, self.product_id);
         }
         if self.price != 0 {
             my_size += ::protobuf::rt::value_varint_zigzag_size(2, self.price);
@@ -1405,8 +1398,8 @@ impl ::protobuf::Message for CreateBidAction {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
-        if !self.product_id.is_empty() {
-            os.write_string(1, &self.product_id)?;
+        if self.product_id != 0 {
+            os.write_sint64(1, self.product_id)?;
         }
         if self.price != 0 {
             os.write_sint64(2, self.price)?;
@@ -1453,7 +1446,7 @@ impl ::protobuf::Message for CreateBidAction {
         unsafe {
             descriptor.get(|| {
                 let mut fields = ::std::vec::Vec::new();
-                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeSint64>(
                     "product_id",
                     |m: &CreateBidAction| { &m.product_id },
                     |m: &mut CreateBidAction| { &mut m.product_id },
@@ -1485,7 +1478,7 @@ impl ::protobuf::Message for CreateBidAction {
 
 impl ::protobuf::Clear for CreateBidAction {
     fn clear(&mut self) {
-        self.product_id.clear();
+        self.product_id = 0;
         self.price = 0;
         self.unknown_fields.clear();
     }
@@ -1769,7 +1762,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     ongitude\"k\n\x12UpdateRecordAction\x12\x1b\n\trecord_id\x18\x01\x20\x01\
     (\tR\x08recordId\x12\x1a\n\x08latitude\x18\x02\x20\x01(\x12R\x08latitude\
     \x12\x1c\n\tlongitude\x18\x03\x20\x01(\x12R\tlongitude\"F\n\x0fCreateBid\
-    Action\x12\x1d\n\nproduct_id\x18\x01\x20\x01(\tR\tproductId\x12\x14\n\
+    Action\x12\x1d\n\nproduct_id\x18\x01\x20\x01(\x12R\tproductId\x12\x14\n\
     \x05price\x18\x02\x20\x01(\x12R\x05price\"r\n\x14TransferRecordAction\
     \x12\x1b\n\trecord_id\x18\x01\x20\x01(\tR\x08recordId\x12'\n\x0freceivin\
     g_agent\x18\x02\x20\x01(\tR\x0ereceivingAgent\x12\x14\n\x05price\x18\x03\
