@@ -56,7 +56,6 @@ pub fn authentication(
         agent.username.clone(),
         &data.database_connection.get().unwrap(),
     );
-    println!("{:?}", &auth_info.username);
 
     hasher.input_str(&agent.password);
     if hasher.result_str() != auth_info.hashed_password {

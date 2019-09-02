@@ -1,4 +1,4 @@
-use crate::database::schema::auth;
+use crate::database::schema::{auth, product};
 use serde::{Serialize};
 
 #[derive(Debug, Queryable)]
@@ -28,4 +28,15 @@ pub struct NewAuth<'a> {
     pub username: &'a str,
     pub hashed_password: &'a str,
     pub encrypted_private_key: &'a str,
+}
+
+#[derive(Insertable)]
+#[table_name = "product"]
+pub struct NewProduct<'a> {
+    pub record_id: &'a str,
+    pub auth_id: i64,
+    pub title: &'a str,
+    pub price: i64,
+    pub latitude: i64,
+    pub longitude: i64,
 }

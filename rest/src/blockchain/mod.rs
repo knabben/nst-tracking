@@ -57,7 +57,7 @@ pub fn serialize_product_payload(
     create_product.set_latitude(latitude);
     create_product.set_longitude(longitude);
 
-    let product_msg = match protobuf::Message::write_to_bytes(&create_product) {
+    let _product_msg = match protobuf::Message::write_to_bytes(&create_product) {
         Ok(b) => b,
         Err(error) => {
             error!("Error serializing request: {:?}", error);
@@ -67,7 +67,7 @@ pub fn serialize_product_payload(
 
     let mut product_payload = SimpleSupplyPayload::new();
     product_payload.set_action(SimpleSupplyPayload_Action::CREATE_RECORD);
-    product_payload.set_create_record(create_product);
+    product_payload.set_create_record(_create_product);
     product_payload.set_timestamp(mills.to_string());
 
     product_payload

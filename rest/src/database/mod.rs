@@ -1,8 +1,8 @@
 pub mod models;
 pub mod schema;
 
-use models::NewAuth;
-use schema::auth;
+use models::{NewAuth, NewProduct};
+use schema::{auth, product};
 
 use std::error::Error;
 use std::ops::Deref;
@@ -101,6 +101,30 @@ pub fn create_auth(
         .expect("Error saving new post")
 }
 
+pub fn create_product(
+    auth_id: i64,
+    record_id: &str,
+    title: &str,
+    price: i64,
+    latitude: i64,
+    longitude: i64,
+    conn: &PgConnection,
+) -> Product {
+    let product_data = NewProduct {
+        record_id: record_id,
+        auth_id: auth_id,
+        title: title,
+        price: price,
+        latitude: latitude,
+        longitude: longitude
+    };
+
+    diesel::insert_into(product::table)
+        .values(&product_data)
+        .get_result(conn)
+        .expect("Error saving new product")
+}
+
 pub fn fetch_auth_resource(un: String, conn: &PgConnection) -> self::models::Auth {
     use self::schema::auth::dsl::*;
     use diesel::prelude::*;
@@ -114,12 +138,12 @@ pub fn fetch_auth_resource(un: String, conn: &PgConnection) -> self::models::Aut
 }
 
 
-pub fn fetch_products(id: i64, conn: &PgConnection) -> Vec<Product> {
+pub fn fetch_products(_id: i64, conn: &PgConnection) -> Vec<Product> {
     use self::schema::product::dsl::*;
     use diesel::prelude::*;
 
     let results = product
-        .filter(auth_id.ne(id))
+        .filter(auth_id.ne_all(vec![_id]))
         .load::<Product>(conn)
         .expect("Error loading products.");
 
