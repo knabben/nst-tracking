@@ -2,14 +2,14 @@ syntax = "proto3";
 
 message Bid {
   // product id
-  uint64 product_id = 1;
+  sint64 product_id = 1;
 
   // initial timestamp
-  uint64 timestamp = 2;
+  sint64 timestamp = 2;
   
   // bid price
-  uint64 price = 3;
+  sint64 price = 3;
 
   // owner of the bid - another user
-  uint64 agent_id = 4;
+  sint64 agent_id = 4;
 }

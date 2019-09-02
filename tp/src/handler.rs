@@ -7,10 +7,13 @@ use std::collections::HashMap;
 use crate::addressing::*;
 use crate::messages::*;
 use crate::protobuf::Message;
+use uuid::Uuid;
+
 
 #[derive(Debug, Clone)]
 enum Action {
     CreateAgent(payload::CreateAgentAction),
+    CreateBid(payload::CreateBidAction),
     CreateRecord(payload::CreateRecordAction),
     UpdateRecord(payload::UpdateRecordAction),
     TransferRecord(payload::TransferRecordAction),
@@ -51,7 +54,11 @@ impl<'a> TradeState<'a> {
         }
     }
 
-    pub fn set_agent(&mut self, agent_id: &str, agent: agent::Agent) -> Result<(), ApplyError> {
+    pub fn set_agent(
+        &mut self, 
+        agent_id: &str, 
+        agent: agent::Agent
+    ) -> Result<(), ApplyError> {
         let address = make_agent_address(agent_id);
         let d = self.context.get_state(vec![address.clone()])?;
         let mut agents = match d {
@@ -168,6 +175,30 @@ impl<'a> TradeState<'a> {
         println!("Product state saved");
         Ok(())
     }
+
+    pub fn set_bid(
+        &mut self,
+        signer: &str,
+        bid: bid::Bid,
+    ) -> Result<(), ApplyError> {
+        let address = make_bid_address(&signer);
+        let serialized = match bid.write_to_bytes() {
+            Ok(serialized) => serialized,
+            Err(_) => {
+                return Err(ApplyError::InternalError(String::from(
+                    "Cannot serialize record container",
+                )))
+            }
+        };
+        let mut sets = HashMap::new();
+        sets.insert(address, serialized);
+        self.context
+            .set_state(sets)
+            .map_err(|err| ApplyError::InternalError(format!("{}", err)))?;
+
+        println!("Bid state saved");
+        Ok(())
+    }
 }
 
 struct TradePayload {
@@ -207,6 +238,10 @@ impl TradePayload {
                 }
                 Action::CreateRecord(payload.get_create_record().clone())
             }
+            
+            payload::SimpleSupplyPayload_Action::CREATE_BID => {
+                Action::CreateBid(payload.get_create_bid().clone())
+            }
 
             payload::SimpleSupplyPayload_Action::UPDATE_RECORD => {
                 Action::UpdateRecord(payload.get_update_record().clone())
@@ -240,6 +275,7 @@ impl TradePayload {
         self.timestamp.clone()
     }
 }
+
 pub struct TradeTransactionHandler {
     family_name: String,
     family_versions: Vec<String>,
@@ -335,6 +371,33 @@ impl TradeTransactionHandler {
         
         Ok(())
     }
+
+    fn _bid_record(
+        &self,
+        payload: payload::CreateBidAction,
+        mut state: TradeState,
+        signer: &str,
+        timestamp: String,
+    ) -> Result<(), ApplyError> {
+        match state.get_agent(signer) {
+                Ok(Some(_)) => (),
+            Ok(None) => {
+                return Err(ApplyError::InvalidTransaction(format!(
+                    "Agent is not registered: {}",
+                    signer
+                )))
+            }
+            Err(err) => return Err(err),
+        }
+        
+        let mut bid = bid::Bid::new();
+        bid.set_agent_id(payload.get_agent_id());
+        bid.set_price(payload.get_price());
+        bid.set_product_id(payload.get_product_id());
+
+        state.set_bid(signer, bid)?;
+        Ok(())
+    }
 }
 
 impl TransactionHandler for TradeTransactionHandler {
@@ -388,6 +451,9 @@ impl TransactionHandler for TradeTransactionHandler {
             Action::CreateRecord(record_payload) => {
                 self._create_record(record_payload, state, signer, payload.get_timestamp());
             },
+            Action::CreateBid(bid_payload) => {
+                self._bid_record(bid_payload, state, signer, payload.get_timestamp())?
+            }
             _ => ()
         }
         Ok(())
