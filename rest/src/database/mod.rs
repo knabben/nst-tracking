@@ -119,7 +119,7 @@ pub fn fetch_products(id: i64, conn: &PgConnection) -> Vec<Product> {
     use diesel::prelude::*;
 
     let results = product
-        .filter(auth_id.eq(id))
+        .filter(auth_id.ne(id))
         .load::<Product>(conn)
         .expect("Error loading products.");
 
