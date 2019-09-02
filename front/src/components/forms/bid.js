@@ -14,7 +14,7 @@ const BidForm = ({id}) => {
 
   return (
     <Formik
-      initialValues={{id: id, price: 0}}
+      initialValues={{product_id: id, price: 0}}
       onSubmit={(values, actions) => {
         dispatch(registerBid(values, token))
         actions.setSubmitting(false)
@@ -32,6 +32,7 @@ const BidForm = ({id}) => {
         <form onSubmit={handleSubmit} noValidate autoComplete="off">
           <Input
             placeholder="Price"
+            type="number"
             className={classes.input}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -39,7 +40,7 @@ const BidForm = ({id}) => {
             id="price"
             label="Price"
           />
-          <input type="hidden" name="product" value={values.id} />
+          <input type="hidden" id="product_id" name="product" value={values.id} />
           <Button type="submit" variant="contained" color="primary">BID</Button>
         </form>
       )}

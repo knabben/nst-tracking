@@ -7,6 +7,7 @@ import { createBrowserHistory } from 'history'
 import { loggerMiddleware } from '../middleware/logger';
 import { apiMiddleware } from '../middleware/api';
 import { userMiddleware } from '../middleware/user';
+import { bidMiddleware } from '../middleware/bid';
 import { productMiddleware } from '../middleware/product';
 import { notificationMiddleware } from '../middleware/notifications';
 import { routerDispatchMiddleware } from '../middleware/router';
@@ -16,7 +17,8 @@ export const history = createBrowserHistory()
 const featureMiddleware = [
   routerDispatchMiddleware,
   userMiddleware,
-  productMiddleware
+  productMiddleware,
+  bidMiddleware,
 ]
 
 const coreMiddleware = [
