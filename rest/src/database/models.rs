@@ -1,11 +1,24 @@
 use crate::database::schema::auth;
+use crate::database::schema::product;
 
-#[derive(Queryable)]
+#[derive(Debug, Queryable)]
 pub struct Auth {
+    pub id: i64,
     pub public_key: String,
     pub username: String,
     pub hashed_password: String,
     pub encrypted_private_key: String,
+}
+
+#[derive(Debug, Queryable)]
+pub struct Product {
+    pub id: i64,
+    pub record_id: String,
+    pub auth_id: i64,
+    pub title: String,
+    pub price: i64,
+    pub latitude: i64,
+    pub longitude: i64,
 }
 
 #[derive(Insertable)]
