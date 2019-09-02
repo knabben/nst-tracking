@@ -2,7 +2,7 @@ import React from 'react'
 import { Container } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
-import Button from '@material-ui/core/Button';
+import BidForm from './forms/bid';
 import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles({
@@ -36,7 +36,7 @@ const Product = ({item}) => {
         <Typography className={classes.title} color="textSecondary" gutterBottom>
           {item.auth_id} - {item.price}
         </Typography>
-        <Button>BID</Button>
+        <BidForm id={item.id} />
       </Card>
     </Container>
   )
