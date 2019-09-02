@@ -12,7 +12,7 @@ r2d2 = "0.8"
 r2d2_postgres = "0.14"
 diesel = { version = "1.4.0", features = ["postgres", "r2d2"] }
 diesel_migrations = "1.4"
-simple_logger = "1.0"
+env_logger = "0.6.2"
 sawtooth-sdk = "0.2"
 rust-crypto = "^0.2"
 protobuf = "2.2"

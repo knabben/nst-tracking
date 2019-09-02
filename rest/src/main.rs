@@ -1,15 +1,9 @@
-#[macro_use]
-extern crate clap;
-#[macro_use]
-extern crate diesel_migrations;
-#[macro_use]
-extern crate diesel;
-#[macro_use]
-extern crate log;
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate hex_literal;
+#[macro_use] extern crate clap;
+#[macro_use] extern crate diesel_migrations;
+#[macro_use] extern crate diesel;
+#[macro_use] extern crate log;
+#[macro_use] extern crate serde_derive;
+#[macro_use] extern crate hex_literal;
 
 extern crate crypto;
 extern crate futures;
@@ -28,7 +22,8 @@ mod routes;
 
 use clap::{App as ClapApp, Arg};
 use log::Level;
-use simple_logger;
+
+
 use std::error::Error;
 
 use crate::database::run_all_migrations;
@@ -67,23 +62,9 @@ fn run() -> Result<(), Box<dyn Error>> {
                 .default_value("0.0.0.0:8086")
                 .takes_value(true),
         )
-        .arg(
-            Arg::with_name("verbose")
-                .help("Bind REST endpoint")
-                .short("v")
-                .multiple(true)
-                .takes_value(true),
-        )
         .get_matches();
 
-    let log_level = match matches.occurrences_of("verbose") {
-        0 => Level::Warn,
-        1 => Level::Info,
-        2 => Level::Debug,
-        _ => Level::Trace,
-    };
-
-    simple_logger::init_with_level(log_level)?;
+    env_logger::init();
 
     let config = config::Config {
         rest_api_endpoint: matches.value_of("bind").unwrap().to_string(),

@@ -67,7 +67,7 @@ pub fn serialize_product_payload(
 
     let mut product_payload = SimpleSupplyPayload::new();
     product_payload.set_action(SimpleSupplyPayload_Action::CREATE_RECORD);
-    product_payload.set_create_record(_create_product);
+    product_payload.set_create_record(create_product);
     product_payload.set_timestamp(mills.to_string());
 
     product_payload
