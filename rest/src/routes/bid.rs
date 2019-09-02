@@ -35,7 +35,7 @@ pub fn create_bid_endpoint(
     let signer = crypto_factory.new_signer(key);
 
     // Serialize payload and send to TP
-    let batch = transaction.store_bid(signer, auth_info.public_key.clone(), &bid);
+    let batch = transaction.store_bid(signer, auth_info.public_key.clone(), &bid, auth_info.id);
     transaction.send_zeromq(data.sawtooth_connection.clone(), batch);
 
     create_bid(

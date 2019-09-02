@@ -1304,6 +1304,7 @@ pub struct CreateBidAction {
     // message fields
     pub product_id: i64,
     pub price: i64,
+    pub agent_id: i64,
     // special fields
     pub unknown_fields: ::protobuf::UnknownFields,
     pub cached_size: ::protobuf::CachedSize,
@@ -1349,6 +1350,21 @@ impl CreateBidAction {
     pub fn set_price(&mut self, v: i64) {
         self.price = v;
     }
+
+    // sint64 agent_id = 3;
+
+
+    pub fn get_agent_id(&self) -> i64 {
+        self.agent_id
+    }
+    pub fn clear_agent_id(&mut self) {
+        self.agent_id = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_agent_id(&mut self, v: i64) {
+        self.agent_id = v;
+    }
 }
 
 impl ::protobuf::Message for CreateBidAction {
@@ -1374,6 +1390,13 @@ impl ::protobuf::Message for CreateBidAction {
                     let tmp = is.read_sint64()?;
                     self.price = tmp;
                 },
+                3 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_sint64()?;
+                    self.agent_id = tmp;
+                },
                 _ => {
                     ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
                 },
@@ -1392,6 +1415,9 @@ impl ::protobuf::Message for CreateBidAction {
         if self.price != 0 {
             my_size += ::protobuf::rt::value_varint_zigzag_size(2, self.price);
         }
+        if self.agent_id != 0 {
+            my_size += ::protobuf::rt::value_varint_zigzag_size(3, self.agent_id);
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
         self.cached_size.set(my_size);
         my_size
@@ -1403,6 +1429,9 @@ impl ::protobuf::Message for CreateBidAction {
         }
         if self.price != 0 {
             os.write_sint64(2, self.price)?;
+        }
+        if self.agent_id != 0 {
+            os.write_sint64(3, self.agent_id)?;
         }
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -1456,6 +1485,11 @@ impl ::protobuf::Message for CreateBidAction {
                     |m: &CreateBidAction| { &m.price },
                     |m: &mut CreateBidAction| { &mut m.price },
                 ));
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeSint64>(
+                    "agent_id",
+                    |m: &CreateBidAction| { &m.agent_id },
+                    |m: &mut CreateBidAction| { &mut m.agent_id },
+                ));
                 ::protobuf::reflect::MessageDescriptor::new::<CreateBidAction>(
                     "CreateBidAction",
                     fields,
@@ -1480,6 +1514,7 @@ impl ::protobuf::Clear for CreateBidAction {
     fn clear(&mut self) {
         self.product_id = 0;
         self.price = 0;
+        self.agent_id = 0;
         self.unknown_fields.clear();
     }
 }
@@ -1761,12 +1796,13 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x20\x01(\x12R\x08latitude\x12\x1c\n\tlongitude\x18\x05\x20\x01(\x12R\tl\
     ongitude\"k\n\x12UpdateRecordAction\x12\x1b\n\trecord_id\x18\x01\x20\x01\
     (\tR\x08recordId\x12\x1a\n\x08latitude\x18\x02\x20\x01(\x12R\x08latitude\
-    \x12\x1c\n\tlongitude\x18\x03\x20\x01(\x12R\tlongitude\"F\n\x0fCreateBid\
+    \x12\x1c\n\tlongitude\x18\x03\x20\x01(\x12R\tlongitude\"a\n\x0fCreateBid\
     Action\x12\x1d\n\nproduct_id\x18\x01\x20\x01(\x12R\tproductId\x12\x14\n\
-    \x05price\x18\x02\x20\x01(\x12R\x05price\"r\n\x14TransferRecordAction\
-    \x12\x1b\n\trecord_id\x18\x01\x20\x01(\tR\x08recordId\x12'\n\x0freceivin\
-    g_agent\x18\x02\x20\x01(\tR\x0ereceivingAgent\x12\x14\n\x05price\x18\x03\
-    \x20\x01(\x12R\x05priceb\x06proto3\
+    \x05price\x18\x02\x20\x01(\x12R\x05price\x12\x19\n\x08agent_id\x18\x03\
+    \x20\x01(\x12R\x07agentId\"r\n\x14TransferRecordAction\x12\x1b\n\trecord\
+    _id\x18\x01\x20\x01(\tR\x08recordId\x12'\n\x0freceiving_agent\x18\x02\
+    \x20\x01(\tR\x0ereceivingAgent\x12\x14\n\x05price\x18\x03\x20\x01(\x12R\
+    \x05priceb\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {
