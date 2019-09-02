@@ -24,7 +24,7 @@ const Home = () => {
       <Redirect to="/signin" />
     ) : (
       <div className="App">
-        { products.map((item) => (<Product key={item.id} item={item} />)) }
+        { products && products.map((item) => (<Product key={item.id} item={item} />)) }
       </div>
     )
   );
