@@ -1,11 +1,10 @@
-use log::Level;
-
 use crate::blockchain::utils;
-use crate::routes::CreateProductRequest;
+use crate::routes::{CreateProductRequest, CreateBidRequest};
 use crate::validator::SawtoothConnection;
 
 use crate::blockchain::{
     serialize_agent_payload, serialize_product_payload, serialize_transaction_payload,
+    serialize_bid_payload
 };
 use protobuf::Message as M;
 use protobuf::RepeatedField;
@@ -14,7 +13,6 @@ use sawtooth_sdk::messages::client_batch_submit::ClientBatchSubmitRequest;
 use sawtooth_sdk::messages::validator::Message_MessageType;
 use sawtooth_sdk::signing;
 use sawtooth_sdk::signing::{Context, PrivateKey, PublicKey};
-use serde::ser;
 use uuid::Uuid;
 
 pub struct BCTransaction {
@@ -130,6 +128,26 @@ impl BCTransaction {
             product.price,
             product.latitude,
             product.longitude,
+        );
+        serialize_transaction_payload(
+            payload,
+            &public_key,
+            self,
+            agent_address.to_string(),
+            signer,
+        )
+    }
+
+    pub fn store_bid(
+        &self,
+        signer: signing::Signer,
+        public_key: String,
+        bid: &CreateBidRequest,
+    ) -> Batch {
+        let agent_address = self.calculate_agent_address(&public_key);
+        let payload = serialize_bid_payload(
+            bid.product_id, 
+            bid.price,
         );
         serialize_transaction_payload(
             payload,

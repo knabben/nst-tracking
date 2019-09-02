@@ -2,7 +2,7 @@ pub mod transaction;
 pub mod utils;
 
 use crate::payload::{
-    CreateAgentAction, CreateRecordAction, SimpleSupplyPayload, SimpleSupplyPayload_Action,
+    CreateAgentAction, CreateBidAction, CreateRecordAction, SimpleSupplyPayload, SimpleSupplyPayload_Action,
 };
 use protobuf::RepeatedField;
 use std::str;
@@ -71,6 +71,33 @@ pub fn serialize_product_payload(
     product_payload.set_timestamp(mills.to_string());
 
     product_payload
+}
+
+pub fn serialize_bid_payload(
+    product_id: i64,
+    price: i64
+) -> SimpleSupplyPayload {
+    let timestamp = time::get_time();
+    let mills = timestamp.sec as u64 + timestamp.nsec as u64 / 1000 / 1000;
+
+    let mut bid_product = CreateBidAction::new();
+    bid_product.set_product_id(product_id);
+    bid_product.set_price(price);
+
+    let _product_msg = match protobuf::Message::write_to_bytes(&bid_product) {
+        Ok(b) => b,
+        Err(error) => {
+            error!("Error serializing request: {:?}", error);
+            return SimpleSupplyPayload::new();
+        }
+    };
+
+    let mut bid_payload = SimpleSupplyPayload::new();
+    bid_payload.set_action(SimpleSupplyPayload_Action::CREATE_BID);
+    bid_payload.set_create_bid(bid_product);
+    bid_payload.set_timestamp(mills.to_string());
+
+    bid_payload
 }
 
 pub fn serialize_transaction_payload(

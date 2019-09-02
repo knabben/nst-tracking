@@ -21,9 +21,6 @@ mod database;
 mod routes;
 
 use clap::{App as ClapApp, Arg};
-use log::Level;
-
-
 use std::error::Error;
 
 use crate::database::run_all_migrations;
@@ -32,7 +29,8 @@ use crate::validator::SawtoothConnection;
 use actix_cors::Cors;
 use actix_web::{http, web, App, HttpServer};
 use routes::agents::{authentication, create_agent};
-use routes::products::{create_products, list_products};
+use routes::products::{create_product_endpoint, list_products};
+use routes::bid::{create_bid_endpoint};
 
 pub struct AppState {
     sawtooth_connection: SawtoothConnection,
@@ -104,7 +102,8 @@ fn run() -> Result<(), Box<dyn Error>> {
             .service(
                 web::scope("/api")
                     .route("/agent", web::post().to(create_agent))
-                    .route("/product", web::post().to(create_products))
+                    .route("/bid", web::post().to(create_bid_endpoint))
+                    .route("/product", web::post().to(create_product_endpoint))
                     .route("/product", web::get().to(list_products))
                     .route("/authentication", web::post().to(authentication)),
             )
@@ -118,7 +117,7 @@ fn run() -> Result<(), Box<dyn Error>> {
 }
 
 fn main() {
-    if let Err(e) = run() {
+    if let Err(_e) = run() {
         std::process::exit(1);
     }
 }
