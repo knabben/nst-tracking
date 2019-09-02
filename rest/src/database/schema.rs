@@ -9,6 +9,14 @@ table! {
 }
 
 table! {
+    bid (id) {
+        id -> Int8,
+        product_id -> Int8,
+        price -> Int8,
+    }
+}
+
+table! {
     product (id) {
         id -> Int8,
         record_id -> Varchar,
@@ -22,5 +30,6 @@ table! {
 
 allow_tables_to_appear_in_same_query!(
     auth,
+    bid,
     product,
 );

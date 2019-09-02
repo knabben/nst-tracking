@@ -1,8 +1,8 @@
 pub mod models;
 pub mod schema;
 
-use models::{NewAuth, NewProduct};
-use schema::{auth, product};
+use models::{NewAuth, NewProduct, NewBid};
+use schema::{auth, product, bid};
 
 use std::error::Error;
 use std::ops::Deref;
@@ -19,7 +19,7 @@ use crypto::sha2::Sha512;
 use crate::diesel::RunQueryDsl;
 type Aes128Cbc = Cbc<Aes128, Pkcs7>;
 
-use crate::database::models::{Auth, Product};
+use crate::database::models::{Auth, Product, Bid};
 use sawtooth_sdk::signing::{PrivateKey, PublicKey};
 
 use diesel::{
@@ -123,6 +123,22 @@ pub fn create_product(
         .values(&product_data)
         .get_result(conn)
         .expect("Error saving new product")
+}
+
+pub fn create_bid(
+    auth_id: i64,
+    product_id: i64,
+    price: i64,
+    conn: &PgConnection
+) -> Bid {
+    let bid_data = NewBid {
+        product_id: product_id,
+        price: price
+    };
+    diesel::insert_into(bid::table)
+        .values(&bid_data)
+        .get_result(conn)
+        .expect("Error saving bid")
 }
 
 pub fn fetch_auth_resource(un: String, conn: &PgConnection) -> self::models::Auth {

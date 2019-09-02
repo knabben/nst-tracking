@@ -1,5 +1,6 @@
 pub mod agents;
 pub mod products;
+pub mod bid;
 pub mod utils;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -15,6 +16,12 @@ pub struct CreateProductRequest {
     pub price: i64,
     pub latitude: i64,
     pub longitude: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreateBidRequest {
+    pub product_id: i64,
+    pub price: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -1,19 +1,13 @@
-use crate::blockchain::serialize_product_payload;
 use crate::blockchain::transaction::BCTransaction;
-use crate::blockchain::utils;
 use crate::database::{create_product, fetch_auth_resource, fetch_products};
 use crate::routes::utils::{decode_private_key, deserialize_jwt};
 use crate::routes::CreateProductRequest;
 use crate::AppState;
-use actix_web::{http, web, HttpRequest, HttpResponse};
-use protobuf::RepeatedField;
-use sawtooth_sdk::messages::client_batch_submit::ClientBatchSubmitRequest;
-use sawtooth_sdk::messages::validator::Message_MessageType;
+use actix_web::{web, HttpRequest, HttpResponse};
 use sawtooth_sdk::signing::secp256k1::Secp256k1PrivateKey;
 use sawtooth_sdk::signing::CryptoFactory;
-use uuid::Uuid;
 
-pub fn create_products(
+pub fn create_product_endpoint(
     item: web::Json<CreateProductRequest>,
     _request: HttpRequest,
     data: web::Data<AppState>,

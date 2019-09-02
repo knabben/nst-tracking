@@ -9,7 +9,6 @@ use crate::routes::Response;
 use block_modes::block_padding::Pkcs7;
 use block_modes::{BlockMode, Cbc};
 use crypto::sha2::Sha256;
-use diesel::pg::PgConnection;
 
 use aes::Aes128;
 type Aes128Cbc = Cbc<Aes128, Pkcs7>;
@@ -30,7 +29,7 @@ pub fn deserialize_jwt(secret: &[u8], jwt_token: &str) -> (bool, String) {
     let jwt_slice = &jwt_token[4..];
     let token = Token::<Header, Registered>::parse(jwt_slice).unwrap();
 
-    if (token.verify(&secret, Sha256::new())) {
+    if token.verify(&secret, Sha256::new()) {
         (true, token.claims.iss.unwrap())
     } else {
         (false, "".to_string())
