@@ -1,7 +1,7 @@
 use crate::blockchain::serialize_product_payload;
 use crate::blockchain::transaction::BCTransaction;
 use crate::blockchain::utils;
-use crate::database::{create_auth, fetch_auth_resource};
+use crate::database::{create_auth, fetch_auth_resource, fetch_products};
 use crate::routes::utils::{decode_private_key, deserialize_jwt};
 use crate::routes::CreateProductRequest;
 use crate::AppState;
@@ -45,4 +45,24 @@ pub fn create_products(
     transaction.send_zeromq(data.sawtooth_connection.clone(), batch);
 
     HttpResponse::Ok().json("Create record transaction submitted")
+}
+
+pub fn list_products(
+    _request: HttpRequest,
+    data: web::Data<AppState>,
+) -> HttpResponse {
+    let header = match _request.headers().get("Authorization".to_string()) {
+        Some(x) => x.to_str().unwrap(),
+        None => "",
+    };
+
+    let (authenticated, username) = deserialize_jwt(data.jwt_sign.as_bytes(), header);
+
+    let db = data.database_connection.get().unwrap();
+    let private_key = decode_private_key(username.clone(), &db);
+    let auth_info = fetch_auth_resource(username.clone(), &db);
+    
+    fetch_products(auth_info.id, &db);
+
+    HttpResponse::Ok().json("")
 }

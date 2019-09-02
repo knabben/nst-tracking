@@ -37,7 +37,7 @@ use crate::validator::SawtoothConnection;
 use actix_cors::Cors;
 use actix_web::{http, web, App, HttpServer};
 use routes::agents::{authentication, create_agent};
-use routes::products::create_products;
+use routes::products::{create_products, list_products};
 
 pub struct AppState {
     sawtooth_connection: SawtoothConnection,
@@ -124,6 +124,7 @@ fn run() -> Result<(), Box<dyn Error>> {
                 web::scope("/api")
                     .route("/agent", web::post().to(create_agent))
                     .route("/product", web::post().to(create_products))
+                    .route("/product", web::get().to(list_products))
                     .route("/authentication", web::post().to(authentication)),
             )
     })
