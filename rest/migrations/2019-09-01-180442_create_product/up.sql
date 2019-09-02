@@ -1,9 +1,9 @@
 CREATE TABLE product (
-  id SERIAL PRIMARY KEY,
+  id BIGSERIAL PRIMARY KEY,
   record_id VARCHAR NOT NULL,
-  auth_id INTEGER,
+  auth_id BIGINT,
   title VARCHAR NOT NULL,
-  price INTEGER,
-  latitude NUMERIC(7, 4),
-  longitude NUMERIC(7, 4)
+  price BIGINT,
+  latitude BIGINT,
+  longitude BIGINT
 );
