@@ -6,7 +6,6 @@ export const FETCH_PRODUCT = `${PRODUCT} FETCH`;
 export const SET_PRODUCT = `${PRODUCT} SET`;
 
 // action creators
-
 export const fetchProduct = (token) => ({
   type: FETCH_PRODUCT,
   meta: {token}
