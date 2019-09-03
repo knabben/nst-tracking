@@ -452,7 +452,7 @@ impl TransactionHandler for TradeTransactionHandler {
                 self._create_record(record_payload, state, signer, payload.get_timestamp());
             },
             Action::CreateBid(bid_payload) => {
-                self._bid_record(bid_payload, state, signer, payload.get_timestamp())?
+                self._bid_record(bid_payload, state, signer, payload.get_timestamp());
             }
             _ => ()
         }
