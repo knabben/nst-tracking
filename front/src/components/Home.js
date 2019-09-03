@@ -4,8 +4,9 @@ import { useSelector, useDispatch } from 'react-redux'
 import { fetchProduct } from '../actions/product'
 import { isAuthenticated, getToken } from '../selectors/user'
 import { getProducts } from '../selectors/product'
-import Product from './Product'
-import { Redirect } from 'react-router'
+import Product from './Product';
+import { Redirect } from 'react-router';
+import Typography from '@material-ui/core/Typography';
 
 const Home = () => {
   const authenticated = useSelector(isAuthenticated);
@@ -24,7 +25,15 @@ const Home = () => {
       <Redirect to="/signin" />
     ) : (
       <div className="App">
-        { products && products.map((item) => (<Product key={item.id} item={item} />)) }
+        <Typography variant="h5" component="h2"> Products </Typography>
+        <div>
+          { 
+            products.length >= 1 && 
+            products.map((item) => (
+              <Product key={item.id} item={item} />
+            )) 
+          }
+        </div>
       </div>
     )
   );

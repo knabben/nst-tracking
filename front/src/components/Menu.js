@@ -24,6 +24,7 @@ const Menu = () => {
           <div>
             <Tab value={0} label="Home" to="/home" component={Link}/>
             <Tab value={1} label="Product" to="/product" component={Link}/>
+            <Tab value={1} label="Bids" to="/bids" component={Link}/>
           </div>
         ) : (
           <div>

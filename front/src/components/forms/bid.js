@@ -25,9 +25,6 @@ const BidForm = ({id}) => {
         handleChange,
         handleBlur,
         values,
-        errors,
-        touched,
-        isSubmitting,
       }) => (
         <form onSubmit={handleSubmit} noValidate autoComplete="off">
           <Input
