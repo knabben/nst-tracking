@@ -6,7 +6,6 @@ export const apiMiddleware = ({dispatch}) => next => action => {
   if (action.type.includes(API_REQUEST)) {
     const { url, method, feature } = action.meta;
     var headers = {'Content-Type': 'application/json'};
-    console.log(action.meta)
 
     if (action.meta.token != "") {
       headers["Authorization"] = `JWT ${action.meta.token}`

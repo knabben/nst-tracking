@@ -1,0 +1,1 @@
+export const getBids = state => state.bid;

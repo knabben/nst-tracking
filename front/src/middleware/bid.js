@@ -1,4 +1,5 @@
-import { BID, REGISTER_BID, FETCH_BID, setBid } from '../actions/bid'
+import { setNotification } from '../actions/notification';
+import { BID, REGISTER_BID, FETCH_BID, setBid } from '../actions/bid';
 import { apiRequest, API_SUCCESS, API_ERROR } from '../actions/api';
 import { setLoader } from '../actions/ui';
 
@@ -22,10 +23,10 @@ export const bidMiddleware = ({dispatch}) => (next) => (action) => {
       next(setBid({bid: action.payload}))
       next(setLoader({state: false, feature: BID}))
       break;
-    
+
     case `${BID} ${API_ERROR}`:
-      //next(setNotification({message: action.payload.message, feature: PRODUCT}))
-      //next(setLoader({state: false, feature: PRODUCT}))
+      next(setNotification({message: action.payload.message, feature: BID}))
+      next(setLoader({state: false, feature: BID}))
       break;
   }
 }

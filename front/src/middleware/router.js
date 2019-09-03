@@ -4,7 +4,6 @@ import { API_SUCCESS } from '../actions/api';
 
 export const routerDispatchMiddleware = ({dispatch}) => (next) => (action) => {
   if (action.type.includes(API_SUCCESS) && action.type.includes(PRODUCT)) {
-    console.log("ACTION", action);
     dispatch(push('/home'));
   }
   next(action);

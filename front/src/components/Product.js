@@ -31,7 +31,7 @@ const Product = ({item}) => {
     <Container component="main" maxWidth="xs">
       <Card className={classes.card}>
         <Typography variant="h5" component="h2">
-          {item.title}
+          {item.title} - {item.id}
         </Typography>
         <Typography className={classes.title} color="textSecondary" gutterBottom>
           {item.auth_id} - {item.price}

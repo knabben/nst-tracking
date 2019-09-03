@@ -28,7 +28,6 @@ const Home = () => {
         <Typography variant="h5" component="h2"> Products </Typography>
         <div>
           { 
-            products.length >= 1 && 
             products.map((item) => (
               <Product key={item.id} item={item} />
             )) 

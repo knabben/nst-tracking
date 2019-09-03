@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import './App.css';
+
 import { Container } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
-import BidForm from './forms/bid';
 import Typography from '@material-ui/core/Typography';
 import { useSelector, useDispatch } from 'react-redux';
 import { isAuthenticated } from '../selectors/user';
 import { fetchBid } from '../actions/bid';
+import { getBids } from '../selectors/bid';
 import { getToken } from '../selectors/user';
 
 const useStyles = makeStyles({
@@ -30,8 +31,9 @@ const useStyles = makeStyles({
 });
 
 const Bids = () => {
+  const classes = useStyles();
+  const bids = useSelector(getBids);
   const authenticated = useSelector(isAuthenticated);
-  // const products = useSelector(getProducts)
   const token = useSelector(getToken);
   const dispatch = useDispatch();
 
@@ -44,7 +46,21 @@ const Bids = () => {
   return (
     <div className="App">
     <Container component="main" maxWidth="xs">
-       <Typography variant="h5" component="h2"> Bids </Typography>
+      <Typography variant="h5" component="h2"> Bids </Typography>
+      <div>
+      {
+        bids && bids.map( (item) => (
+          <Card className={classes.card}>
+            <Typography variant="h5" component="h2">
+              id {item.id} - product-id {item.product_id} 
+            </Typography>
+            <Typography className={classes.title} color="textSecondary" gutterBottom>
+              bid price - {item.price}
+            </Typography>
+          </Card>
+        ))
+      }
+      </div>
     </Container>
     </div>
   )
