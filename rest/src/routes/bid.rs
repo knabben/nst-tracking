@@ -5,7 +5,7 @@ use crate::routes::CreateBidRequest;
 use crate::routes::utils::{decode_private_key, deserialize_jwt};
 use sawtooth_sdk::signing::secp256k1::Secp256k1PrivateKey;
 use sawtooth_sdk::signing::CryptoFactory;
-use crate::database::{create_bid, fetch_auth_resource};
+use crate::database::{create_bid, fetch_bid, fetch_auth_resource};
 
 pub fn create_bid_endpoint(
     item: web::Json<CreateBidRequest>,
@@ -46,4 +46,20 @@ pub fn create_bid_endpoint(
     );
 
     HttpResponse::Ok().json("Create record transaction submitted")
+}
+
+pub fn list_bid_endpoint(
+    _request: HttpRequest,
+    data: web::Data<AppState>,
+) -> HttpResponse {
+     let header = match _request.headers().get("Authorization".to_string()) {
+        Some(x) => x.to_str().unwrap(),
+        None => "",
+    };
+
+    let (_, username) = deserialize_jwt(data.jwt_sign.as_bytes(), header);
+    let db = data.database_connection.get().unwrap();
+    let auth_info = fetch_auth_resource(username.clone(), &db);
+
+    HttpResponse::Ok().json(fetch_bid(auth_info.id, &db))
 }

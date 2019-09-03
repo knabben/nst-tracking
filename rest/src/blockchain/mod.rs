@@ -126,10 +126,11 @@ pub fn serialize_transaction_payload(
             return Batch::new();
         }
     };
-    debug!("agent - {:?}", agent_msg);
 
-    let inputs =  inputs; //vec![agent_address.to_string()];
-    let outputs = outputs; //vec![agent_address.to_string()];
+    debug!("inputs: {:?}, outputs: {:?}", inputs, outputs);
+
+    let inputs =  inputs;
+    let outputs = outputs;
 
     // Transaction header
     let mut transaction_header = TransactionHeader::new();

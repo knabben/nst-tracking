@@ -1,18 +1,21 @@
 use crate::database::schema::{auth, product, bid};
 use serde::{Serialize};
 
+pub type Id = i64;
+
 #[derive(Debug, Queryable)]
 pub struct Auth {
-    pub id: i64,
+    pub id: Id,
     pub public_key: String,
     pub username: String,
     pub hashed_password: String,
     pub encrypted_private_key: String,
 }
 
-#[derive(Debug, Serialize, Queryable)]
+#[derive(Debug, Serialize, Identifiable, Queryable)]
+#[table_name = "product"]
 pub struct Product {
-    pub id: i64,
+    pub id: Id,
     pub record_id: String,
     pub auth_id: i64,
     pub title: String,
@@ -21,9 +24,11 @@ pub struct Product {
     pub longitude: i64,
 }
 
-#[derive(Debug, Serialize, Queryable)]
+#[derive(Debug, Associations, Identifiable, Serialize, Queryable)]
+#[belongs_to(Product, foreign_key="product_id")]
+#[table_name = "bid"]
 pub struct Bid {
-    pub id: i64,
+    pub id: Id,
     pub product_id: i64,
     pub price: i64,
 }

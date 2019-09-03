@@ -2,6 +2,7 @@ pub mod models;
 pub mod schema;
 
 use models::{NewAuth, NewProduct, NewBid};
+use crate::database::models::{Auth, Product, Bid};
 use schema::{auth, product, bid};
 
 use std::error::Error;
@@ -18,8 +19,6 @@ use crypto::sha2::Sha512;
 
 use crate::diesel::RunQueryDsl;
 type Aes128Cbc = Cbc<Aes128, Pkcs7>;
-
-use crate::database::models::{Auth, Product, Bid};
 use sawtooth_sdk::signing::{PrivateKey, PublicKey};
 
 use diesel::{
@@ -141,6 +140,27 @@ pub fn create_bid(
         .expect("Error saving bid")
 }
 
+pub fn fetch_bid(
+    _auth_id: i64,
+    conn: &PgConnection,
+) -> Vec<Bid> {
+    use crate::diesel::ExpressionMethods;
+    use self::schema::product::dsl::*;
+    use crate::diesel::QueryDsl;
+    use crate::diesel::query_dsl::BelongingToDsl;
+
+    let p = product
+        .filter(auth_id.ne_all(vec![_auth_id]))
+        .first::<Product>(conn)
+        .expect("Error product");
+
+    let bids = Bid::belonging_to(&p)
+        .load::<Bid>(conn)
+        .expect("Error loading photos");
+
+    bids
+}
+
 pub fn fetch_auth_resource(un: String, conn: &PgConnection) -> self::models::Auth {
     use self::schema::auth::dsl::*;
     use diesel::prelude::*;
@@ -152,7 +172,6 @@ pub fn fetch_auth_resource(un: String, conn: &PgConnection) -> self::models::Aut
 
     results
 }
-
 
 pub fn fetch_products(_id: i64, conn: &PgConnection) -> Vec<Product> {
     use self::schema::product::dsl::*;

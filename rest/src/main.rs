@@ -30,7 +30,7 @@ use actix_cors::Cors;
 use actix_web::{http, web, App, HttpServer};
 use routes::agents::{authentication, create_agent};
 use routes::products::{create_product_endpoint, list_products};
-use routes::bid::{create_bid_endpoint};
+use routes::bid::{list_bid_endpoint, create_bid_endpoint};
 
 pub struct AppState {
     sawtooth_connection: SawtoothConnection,
@@ -103,6 +103,7 @@ fn run() -> Result<(), Box<dyn Error>> {
                 web::scope("/api")
                     .route("/agent", web::post().to(create_agent))
                     .route("/bid", web::post().to(create_bid_endpoint))
+                    .route("/bid", web::get().to(list_bid_endpoint))
                     .route("/product", web::post().to(create_product_endpoint))
                     .route("/product", web::get().to(list_products))
                     .route("/authentication", web::post().to(authentication)),
